@@ -133,7 +133,12 @@ const CATEGORY_COLORS: Record<string, { color: string; bg: string }> = {
   outros: { color: '#6b7280', bg: '#f3f4f6' },
 };
 
-function MedicineCardBase({ medicine }: { medicine: Medicine }) {
+interface MedicineCardProps {
+  medicine: Medicine;
+  hideFavorite?: boolean;
+}
+
+function MedicineCardBase({ medicine, hideFavorite = false }: MedicineCardProps) {
   const { user } = useAuth();
   const isPatient = user?.role === 'user';
   const inStock = medicine.quantidade > 0;
@@ -177,7 +182,7 @@ function MedicineCardBase({ medicine }: { medicine: Medicine }) {
             {medicine.concentracao ? ` · ${medicine.concentracao}` : ''}
           </Meta>
         </div>
-        {isPatient ? (
+        {isPatient && !hideFavorite ? (
           <HeartBtn onClick={toggleFav} aria-label={isFav ? 'Remover favorito' : 'Favoritar'}>
             {isFav ? <FaHeart /> : <FaRegHeart />}
           </HeartBtn>

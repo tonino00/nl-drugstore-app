@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { FaUserCircle, FaChevronDown } from 'react-icons/fa';
+import { FaUserCircle, FaChevronDown, FaBars } from 'react-icons/fa';
 
 import NotificationBell from '../Notification/NotificationBell';
 import { APP_NAME } from '../../utils/constants';
@@ -29,6 +29,24 @@ const Center = styled.div`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
+`;
+
+const MenuBtn = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.grayDark};
+  padding: 6px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grayLight};
+  }
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    display: inline-flex;
+  }
 `;
 
 const Right = styled.div`
@@ -100,7 +118,11 @@ const DropdownButton = styled.button`
   }
 `;
 
-export default function Header() {
+interface HeaderProps {
+  onMenuToggle?: () => void;
+}
+
+export default function Header({ onMenuToggle }: HeaderProps) {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -117,7 +139,12 @@ export default function Header() {
 
   return (
     <Bar>
-      <Title as={Link} to="/medicines">{APP_NAME}</Title>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <MenuBtn type="button" onClick={onMenuToggle} aria-label="Menu">
+          <FaBars size={22} />
+        </MenuBtn>
+        <Title as={Link} to="/medicines">{APP_NAME}</Title>
+      </div>
 
       <Right>
         <NotificationBell />

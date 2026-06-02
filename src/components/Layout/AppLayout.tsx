@@ -1,4 +1,5 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 
 import Header from './Header';
@@ -35,13 +36,13 @@ const Footer = styled.footer`
 `;
 
 export default function AppLayout() {
-  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <Shell>
-      <Sidebar />
+      <Sidebar isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
       <Main>
-        <Header />
+        <Header onMenuToggle={() => setMobileMenuOpen((v) => !v)} />
         <Content>
           <Outlet />
         </Content>

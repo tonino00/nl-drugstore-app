@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../hooks/useAuth';
 import { medicineService } from '../../services/medicineService';
 import type { Medicine } from '../../types/medicine.types';
+import ExpiryAlertCard from '../../components/Dashboard/ExpiryAlertCard';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -145,6 +146,8 @@ export default function DashboardPage() {
           </div>
         </div>
       ) : null}
+
+      <ExpiryAlertCard />
     </div>
   );
 }

@@ -108,10 +108,35 @@ export default function ListMedicinesPage() {
             </div>
           ) : null}
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
-            <label style={{ fontSize: 14, color: '#616161', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              marginTop: 12,
+            }}
+          >
+            <label
+              style={{
+                fontSize: 14,
+                color: '#616161',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                flexWrap: 'wrap',
+              }}
+            >
               Itens por página:
-              <select value={limit} onChange={(e) => setLimit(Number(e.target.value))}>
+              <select
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value))}
+                style={{
+                  padding: '6px 10px',
+                  borderRadius: 8,
+                  border: '1px solid #e5e7eb',
+                  fontSize: 14,
+                  minWidth: 72,
+                }}
+              >
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={50}>50</option>

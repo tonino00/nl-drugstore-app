@@ -7,6 +7,7 @@ import { medicineService } from '../../services/medicineService';
 import { favoriteService } from '../../services/favoriteService';
 import StockBadge from '../../components/Medicine/StockBadge';
 import ExpiryAlert from '../../components/Medicine/ExpiryAlert';
+import BatchesTable from '../../components/Medicine/BatchesTable';
 import { useAuth } from '../../hooks/useAuth';
 
 import { Actions, Btn, Card } from '../../styles/pages/Medicines/MedicineDetail/styles';
@@ -50,6 +51,13 @@ export default function MedicineDetailPage() {
         <Link to="/medicines" style={{ color: '#616161', textDecoration: 'none', fontSize: 14 }}>← Voltar</Link>
         <h2 style={{ margin: 0 }}>{medicine.nome}</h2>
       </div>
+
+      {/* Controle de lotes */}
+      {isPharmacist ? (
+        <div style={{ borderRadius: 12, border: '1px solid #e5e7eb', padding: 24, marginBottom: 20, background: '#fff' }}>
+          <BatchesTable medicineId={medicine.id} canManage />
+        </div>
+      ) : null}
 
       {/* Status badges */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>

@@ -25,6 +25,7 @@ const StockMovements = lazy(() => import('../pages/Stock/StockMovements'));
 const Notifications = lazy(() => import('../pages/Notifications'));
 const PharmacyHours = lazy(() => import('../pages/PharmacyHours'));
 const Profile = lazy(() => import('../pages/Profile'));
+const BatchTrace = lazy(() => import('../pages/BatchTrace'));
 
 const withSuspense = (el: ReactElement) => (
   <Suspense fallback={<Loader fullScreen />}>
@@ -70,6 +71,7 @@ export const router = createBrowserRouter([
               { path: '/favorites', element: withSuspense(<Favorites />) },
             ],
           },
+          { path: '/batch-trace', element: withSuspense(<BatchTrace />) },
         ]
       }
     ]

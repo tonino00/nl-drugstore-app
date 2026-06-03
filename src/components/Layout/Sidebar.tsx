@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
-import { FaPills, FaHeart, FaBell, FaClock, FaChartLine, FaBoxes, FaSignOutAlt, FaPlusCircle, FaTimes } from 'react-icons/fa';
+import { FaPills, FaHeart, FaBell, FaClock, FaChartLine, FaBoxes, FaSignOutAlt, FaPlusCircle, FaTimes, FaSearch } from 'react-icons/fa';
 
 import { useAuth } from '../../hooks/useAuth';
 
@@ -151,10 +151,16 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           )}
 
           {!isPharmacist && (
-            <Item to="/favorites" onClick={onClose}>
-              <FaHeart />
-              <span>Favoritos</span>
-            </Item>
+            <>
+              <Item to="/favorites" onClick={onClose}>
+                <FaHeart />
+                <span>Favoritos</span>
+              </Item>
+              <Item to="/batch-trace" onClick={onClose}>
+                <FaSearch />
+                <span>Rastrear lote</span>
+              </Item>
+            </>
           )}
 
           <Item to="/notifications" onClick={onClose}>

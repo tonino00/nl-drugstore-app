@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 import { FaUserCircle, FaChevronDown, FaBars } from 'react-icons/fa';
 
 import NotificationBell from '../Notification/NotificationBell';
+import PharmacyStatus from '../Pharmacy/PharmacyStatus';
 import { APP_NAME } from '../../utils/constants';
 import { useAuth } from '../../hooks/useAuth';
 
 const Bar = styled.header`
-  height: 64px;
   background: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grayLight};
   display: flex;
@@ -16,6 +16,16 @@ const Bar = styled.header`
   justify-content: space-between;
   padding: 0 ${({ theme }) => theme.spacing.lg};
   position: relative;
+  height: 64px;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    height: auto;
+    min-height: 64px;
+    padding: ${({ theme }) => `${theme.spacing.xs} ${theme.spacing.md}`};
+    flex-direction: column;
+    align-items: stretch;
+    gap: ${({ theme }) => theme.spacing.xs};
+  }
 `;
 
 const Title = styled.h1`
@@ -53,6 +63,11 @@ const Right = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.md};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    justify-content: space-between;
+    width: 100%;
+  }
 `;
 
 const UserMenu = styled.div`
@@ -139,7 +154,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
   return (
     <Bar>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
         <MenuBtn type="button" onClick={onMenuToggle} aria-label="Menu">
           <FaBars size={22} />
         </MenuBtn>
@@ -147,6 +162,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       <Right>
+        <PharmacyStatus compact />
         <NotificationBell />
         <UserMenu ref={dropdownRef}>
           <UserTrigger onClick={() => setOpen((v) => !v)}>

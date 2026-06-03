@@ -57,7 +57,6 @@ export default function FavoritesPage() {
   return (
     <Page>
       <Header>
-        <FaHeart size={22} color="#D32F2F" />
         <h2>Meus favoritos</h2>
       </Header>
 

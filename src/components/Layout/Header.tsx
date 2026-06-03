@@ -154,7 +154,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
   return (
     <Bar>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <MenuBtn type="button" onClick={onMenuToggle} aria-label="Menu">
           <FaBars size={22} />
         </MenuBtn>
@@ -162,7 +162,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       </div>
 
       <Right>
-        <PharmacyStatus compact />
+        {user?.role === 'user' ? <PharmacyStatus compact /> : null}
         <NotificationBell />
         <UserMenu ref={dropdownRef}>
           <UserTrigger onClick={() => setOpen((v) => !v)}>

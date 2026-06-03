@@ -69,6 +69,13 @@ export default function PharmacyHoursPage() {
     }
   }, [hours]);
 
+  const formatTime = (value?: string | null) => {
+    if (!value) return '';
+    const [h, m] = value.split(':');
+    if (!h || !m) return value;
+    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+  };
+
   // Calcular status atual baseado nos horários locais (form)
   useEffect(() => {
     if (form.length === 0) return;
@@ -82,10 +89,16 @@ export default function PharmacyHoursPage() {
       // Próxima abertura: buscar próximo dia aberto
       for (let offset = 1; offset <= 7; offset++) {
         const checkIdx = (todayIdx + offset) % 7;
-        const day = form.find((d) => d.day_of_week === checkIdx);
-        if (day && day.is_open && day.opening_time) {
-          const label = offset === 1 ? 'amanhã' : DAYS[checkIdx];
-          setNextOpen(`${label} às ${day.opening_time}`);
+        const day = form.find((d) => d.day_of_week === checkIdx && d.is_open && d.opening_time);
+        if (day) {
+          const openLabel = formatTime(day.opening_time || undefined);
+          const closeLabel = formatTime(day.closing_time || undefined);
+          const label = offset === 1 ? 'Amanhã' : DAYS[checkIdx];
+          setNextOpen(
+            closeLabel
+              ? `${label} — ${openLabel} às ${closeLabel}`
+              : `${label} às ${openLabel}`,
+          );
           break;
         }
       }
@@ -100,18 +113,32 @@ export default function PharmacyHoursPage() {
     const isOpenNow = todayMinutes >= openMinutes && todayMinutes < closeMinutes;
     setCurrentOpen(isOpenNow);
 
+    const todayOpenLabel = formatTime(today.opening_time);
+    const todayCloseLabel = formatTime(today.closing_time);
+
     if (isOpenNow) {
-      setNextClose(`${today.closing_time} (hoje)`);
+      setNextClose(`${todayCloseLabel} (hoje)`);
     } else if (todayMinutes < openMinutes) {
-      setNextOpen(`hoje às ${today.opening_time}`);
+      // Ainda não abriu hoje
+      setNextOpen(
+        todayCloseLabel
+          ? `Hoje — ${todayOpenLabel} às ${todayCloseLabel}`
+          : `Hoje às ${todayOpenLabel}`,
+      );
     } else {
       // Já passou do horário de fechamento, buscar próximo dia
       for (let offset = 1; offset <= 7; offset++) {
         const checkIdx = (todayIdx + offset) % 7;
-        const day = form.find((d) => d.day_of_week === checkIdx);
-        if (day && day.is_open && day.opening_time) {
-          const label = offset === 1 ? 'amanhã' : DAYS[checkIdx];
-          setNextOpen(`${label} às ${day.opening_time}`);
+        const day = form.find((d) => d.day_of_week === checkIdx && d.is_open && d.opening_time);
+        if (day) {
+          const openLabel = formatTime(day.opening_time || undefined);
+          const closeLabel = formatTime(day.closing_time || undefined);
+          const label = offset === 1 ? 'Amanhã' : DAYS[checkIdx];
+          setNextOpen(
+            closeLabel
+              ? `${label} — ${openLabel} às ${closeLabel}`
+              : `${label} às ${openLabel}`,
+          );
           break;
         }
       }

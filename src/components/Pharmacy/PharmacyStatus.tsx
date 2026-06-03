@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { fetchNextOpeningThunk, fetchPharmacyStatusThunk } from '../../store/slices/pharmacySlice';
+import { fetchNextOpeningThunk, fetchPharmacyHoursThunk, fetchPharmacyStatusThunk } from '../../store/slices/pharmacySlice';
 
 const DAYS = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
@@ -36,24 +36,65 @@ export default function PharmacyStatus({ compact }: { compact?: boolean }) {
   const dispatch = useAppDispatch();
   const status = useAppSelector((s) => s.pharmacy.status);
   const next = useAppSelector((s) => s.pharmacy.nextOpening);
+  const hours = useAppSelector((s) => s.pharmacy.hours);
 
   useEffect(() => {
     if (!status) dispatch(fetchPharmacyStatusThunk());
     if (!next) dispatch(fetchNextOpeningThunk());
-  }, [status, next, dispatch]);
+    if (!hours) dispatch(fetchPharmacyHoursThunk());
+  }, [status, next, hours, dispatch]);
 
   const open = status?.open;
-  const dayName = next?.day_of_week != null ? DAYS[next.day_of_week] : null;
-  const time = next?.opening_time;
+  const dayIndex = next?.day_of_week;
+  const dayName = dayIndex != null ? DAYS[dayIndex] : null;
+
+  const nextDayHours =
+    dayIndex != null && hours
+      ? hours.find((d) => d.day_of_week === dayIndex && d.is_open)
+      : undefined;
+
+  const rawOpenTime = nextDayHours?.opening_time ?? next?.opening_time;
+  const rawCloseTime = nextDayHours?.closing_time;
+
+  const formatTime = (value?: string | null) => {
+    if (!value) return null;
+    const [h, m] = value.split(':');
+    if (!h || !m) return value;
+    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+  };
+
+  const openLabel = formatTime(rawOpenTime);
+  const closeLabel = formatTime(rawCloseTime);
+
+  const shortDay = dayName === 'Segunda-feira'
+    ? 'segunda'
+    : dayName === 'Terça-feira'
+    ? 'terça'
+    : dayName === 'Quarta-feira'
+    ? 'quarta'
+    : dayName === 'Quinta-feira'
+    ? 'quinta'
+    : dayName === 'Sexta-feira'
+    ? 'sexta'
+    : dayName === 'Sábado'
+    ? 'sábado'
+    : 'domingo';
+
+  const todayIndex = new Date().getDay();
+  const isToday = dayIndex != null && dayIndex === todayIndex;
 
   return (
     <Wrapper $compact={compact} $open={open}>
       <StatusBadge $open={open}>
         {open ? '🟢 ABERTO' : '🔴 FECHADO'}
       </StatusBadge>
-      {!open && dayName && time ? (
+      {!open && dayName && openLabel ? (
         <NextLabel>
-          Abre {dayName === 'Segunda-feira' ? 'segunda' : dayName === 'Terça-feira' ? 'terça' : dayName === 'Quarta-feira' ? 'quarta' : dayName === 'Quinta-feira' ? 'quinta' : dayName === 'Sexta-feira' ? 'sexta' : dayName === 'Sábado' ? 'sábado' : 'domingo'} às {time}
+          {isToday
+            ? `Hoje — ${openLabel}${closeLabel ? ` às ${closeLabel}` : ''}`
+            : `Abre ${shortDay} ${
+                closeLabel ? `— ${openLabel} às ${closeLabel}` : `às ${openLabel}`
+              }`}
         </NextLabel>
       ) : null}
     </Wrapper>

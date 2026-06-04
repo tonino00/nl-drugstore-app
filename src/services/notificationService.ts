@@ -41,7 +41,8 @@ export const notificationService = {
   },
 };
 
-export const createNotificationEventSource = () => {
-  const url = import.meta.env.VITE_SSE_URL;
+export const createNotificationEventSource = (token?: string | null) => {
+  const baseUrl = import.meta.env.VITE_SSE_URL;
+  const url = token ? `${baseUrl}?token=${encodeURIComponent(token)}` : baseUrl;
   return new EventSource(url);
 };

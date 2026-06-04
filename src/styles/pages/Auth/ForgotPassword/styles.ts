@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 export const Page = styled.div`
   min-height: 100vh;
@@ -35,7 +36,7 @@ export const Page = styled.div`
 
 export const Card = styled.div`
   width: 100%;
-  max-width: 520px;
+  max-width: 440px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -58,7 +59,7 @@ export const Card = styled.div`
   }
 
   @media (max-width: 768px) {
-    max-width: 480px;
+    max-width: 400px;
     padding: ${({ theme }) => theme.spacing.lg};
   }
 
@@ -75,10 +76,35 @@ export const Header = styled.div`
   align-items: center;
   text-align: center;
   margin-bottom: ${({ theme }) => theme.spacing.xl};
-  gap: ${({ theme }) => theme.spacing.sm};
+  gap: ${({ theme }) => theme.spacing.md};
 
   @media (max-width: 480px) {
     margin-bottom: ${({ theme }) => theme.spacing.lg};
+  }
+`;
+
+export const IconCircle = styled.div`
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e6f7f1, #d4f1e8);
+  color: #0d7377;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #d4f1e8, #c0eadc);
+  }
+
+  @media (max-width: 480px) {
+    width: 64px;
+    height: 64px;
+    font-size: 1.75rem;
   }
 `;
 
@@ -123,9 +149,23 @@ export const Label = styled.label`
   letter-spacing: 0.025em;
 `;
 
+export const InputWrap = styled.div`
+  position: relative;
+`;
+
+export const InputIcon = styled.span`
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+`;
+
 export const Field = styled.input`
   width: 100%;
-  padding: 12px 16px;
+  padding: 12px 16px 12px 48px;
   border-radius: 12px;
   border: 2px solid #e5e7eb;
   outline: none;
@@ -139,6 +179,10 @@ export const Field = styled.input`
     transform: translateY(-1px);
   }
 
+  &:focus + ${InputIcon} {
+    color: #0d7377;
+  }
+
   &:hover {
     border-color: #d1d5db;
   }
@@ -148,49 +192,8 @@ export const Field = styled.input`
   }
 
   @media (max-width: 480px) {
-    padding: 10px 14px;
+    padding: 10px 14px 10px 44px;
     font-size: 0.95rem;
-  }
-`;
-
-export const PasswordWrap = styled.div`
-  position: relative;
-`;
-
-export const PasswordField = styled(Field)`
-  padding-right: 44px;
-`;
-
-export const PasswordToggle = styled.button`
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: #6b7280;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-
-  &:active {
-    transform: translateY(-50%) scale(0.95);
-  }
-
-  @media (max-width: 480px) {
-    width: 32px;
-    height: 32px;
-    right: 10px;
   }
 `;
 
@@ -228,6 +231,10 @@ export const Button = styled.button<{ $loading?: boolean }>`
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 
   &:before {
     content: '';
@@ -292,43 +299,40 @@ export const Button = styled.button<{ $loading?: boolean }>`
   }
 `;
 
-export const Links = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.lg};
+export const BackLink = styled(Link)`
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: ${({ theme }) => theme.spacing.sm};
-  flex-wrap: wrap;
-  
-  a {
-    color: #6b7280;
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.2s ease;
-    position: relative;
+  gap: 8px;
+  margin-top: ${({ theme }) => theme.spacing.lg};
+  color: #6b7280;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  position: relative;
 
-    &:hover {
-      color: #0d7377;
-    }
+  &:hover {
+    color: #0d7377;
+  }
 
-    &:after {
-      content: '';
-      position: absolute;
-      bottom: -2px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: #0d7377;
-      transition: width 0.3s ease;
-    }
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #0d7377;
+    transition: width 0.3s ease;
+  }
 
-    &:hover:after {
-      width: 100%;
-    }
+  &:hover:after {
+    width: 100%;
   }
 
   @media (max-width: 480px) {
     margin-top: ${({ theme }) => theme.spacing.md};
-    text-align: center;
+    font-size: 0.8rem;
   }
 `;
 
@@ -354,23 +358,4 @@ export const SuccessMessage = styled.div`
       transform: translateY(0);
     }
   }
-`;
-
-export const PasswordStrength = styled.div<{ $strength: number }>`
-  height: 4px;
-  border-radius: 2px;
-  margin-top: 8px;
-  background: ${({ $strength }) => {
-    if ($strength <= 2) return '#ef4444';
-    if ($strength <= 3) return '#f59e0b';
-    return '#10b981';
-  }};
-  width: ${({ $strength }) => ($strength / 5) * 100}%;
-  transition: all 0.3s ease;
-`;
-
-export const PasswordStrengthText = styled.div`
-  font-size: 0.75rem;
-  margin-top: 4px;
-  color: #6b7280;
 `;

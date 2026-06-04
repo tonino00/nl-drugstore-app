@@ -23,6 +23,9 @@ import {
   Row,
   Subtitle,
   Title,
+  SuccessMessage,
+  PasswordStrength,
+  PasswordStrengthText,
 } from '../../styles/pages/Auth/Register/styles';
 
 const schema = Yup.object({
@@ -40,55 +43,113 @@ const formatPhoneBR = (input: string) => {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 };
 
+const getPasswordStrength = (password: string): number => {
+  let strength = 0;
+  if (password.length >= 6) strength++;
+  if (password.length >= 10) strength++;
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+  if (/\d/.test(password)) strength++;
+  if (/[^a-zA-Z\d]/.test(password)) strength++;
+  return strength;
+};
+
+const getPasswordStrengthText = (strength: number): string => {
+  if (strength <= 2) return 'Senha fraca';
+  if (strength <= 3) return 'Senha média';
+  return 'Senha forte';
+};
+
 export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
+  const [registerError, setRegisterError] = useState('');
 
   const initialValues = useMemo(() => ({ nome: '', email: '', telefone: '', senha: '' }), []);
 
   return (
     <Page>
+      <div style={{ 
+        position: 'absolute', 
+        top: '40px', 
+        left: '40px',
+        color: 'white',
+        fontSize: '2rem',
+        fontWeight: '700',
+        textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        zIndex: 1
+      }}>
+        💊 NL Drugstore
+      </div>
       <Card>
         <Header>
           <Title>Criar conta</Title>
-          <Subtitle>Preencha seus dados para criar uma conta.</Subtitle>
+          <Subtitle>Preencha seus dados para acessar o sistema</Subtitle>
         </Header>
+        {registerSuccess && (
+          <SuccessMessage>
+            ✓ Conta criada com sucesso!
+          </SuccessMessage>
+        )}
         <Formik
           initialValues={initialValues}
           validationSchema={schema}
           onSubmit={async (values, { setSubmitting }) => {
             try {
+              setRegisterError('');
+              setRegisterSuccess(false);
               const result = await dispatch(registerThunk(values as any));
               if (registerThunk.fulfilled.match(result)) {
-                toast.success('Cadastro realizado');
-                navigate('/medicines', { replace: true });
+                setRegisterSuccess(true);
+                toast.success('Cadastro realizado com sucesso');
+                setTimeout(() => {
+                  navigate('/medicines', { replace: true });
+                }, 1500);
               } else {
-                toast.error((result.payload as string) || 'Falha no cadastro');
+                const errorMsg = (result.payload as string) || 'Falha no cadastro';
+                setRegisterError(errorMsg);
+                toast.error(errorMsg);
               }
             } catch {
-              toast.error('Falha no cadastro');
+              const errorMsg = 'Falha no cadastro';
+              setRegisterError(errorMsg);
+              toast.error(errorMsg);
             } finally {
               setSubmitting(false);
             }
           }}
         >
-          {({ values, handleChange, touched, errors, setFieldValue, isSubmitting, submitForm }) => (
-            <Form>
+          {({ values, handleChange, touched, errors, setFieldValue, isSubmitting, submitForm }) => {
+            const passwordStrength = getPasswordStrength((values as any).senha || '');
+            
+            return (
+              <Form>
               <Row>
-                <Label>Nome</Label>
-                <Field name="nome" value={(values as any).nome} onChange={handleChange} />
-                {(touched as any).nome && (errors as any).nome ? <Error>{(errors as any).nome}</Error> : null}
+                <Label>Nome completo</Label>
+                <Field 
+                  name="nome" 
+                  value={(values as any).nome} 
+                  onChange={handleChange}
+                  placeholder="Digite seu nome completo"
+                />
+                {(touched as any).nome && (errors as any).nome ? <Error>⚠ {(errors as any).nome}</Error> : null}
               </Row>
 
               <Row>
                 <Label>Email</Label>
-                <Field name="email" value={values.email} onChange={handleChange} />
-                {touched.email && errors.email ? <Error>{errors.email}</Error> : null}
+                <Field 
+                  name="email" 
+                  value={values.email} 
+                  onChange={handleChange}
+                  placeholder="seu@email.com"
+                  type="email"
+                />
+                {touched.email && errors.email ? <Error>⚠ {errors.email}</Error> : null}
               </Row>
 
               <Row>
-                <Label>Telefone</Label>
+                <Label>Telefone (opcional)</Label>
                 <Field
                   name="telefone"
                   inputMode="tel"
@@ -97,7 +158,7 @@ export default function RegisterPage() {
                   onChange={(e) => setFieldValue('telefone', formatPhoneBR(e.target.value))}
                 />
                 {(touched as any).telefone && (errors as any).telefone ? (
-                  <Error>{(errors as any).telefone}</Error>
+                  <Error>⚠ {(errors as any).telefone}</Error>
                 ) : null}
               </Row>
 
@@ -109,6 +170,7 @@ export default function RegisterPage() {
                     name="senha"
                     value={(values as any).senha}
                     onChange={handleChange}
+                    placeholder="••••••••"
                   />
                   <PasswordToggle
                     type="button"
@@ -119,20 +181,48 @@ export default function RegisterPage() {
                     {showPassword ? <FaEyeSlash aria-hidden /> : <FaEye aria-hidden />}
                   </PasswordToggle>
                 </PasswordWrap>
-                {(touched as any).senha && (errors as any).senha ? <Error>{(errors as any).senha}</Error> : null}
+                {(touched as any).senha && (errors as any).senha ? <Error>⚠ {(errors as any).senha}</Error> : null}
+                {registerError && !touched.senha && <Error>⚠ {registerError}</Error>}
+                {(values as any).senha && (
+                  <>
+                    <PasswordStrength $strength={passwordStrength} />
+                    <PasswordStrengthText>
+                      Força da senha: {getPasswordStrengthText(passwordStrength)}
+                    </PasswordStrengthText>
+                  </>
+                )}
               </Row>
 
-              <Button type="button" onClick={submitForm} disabled={isSubmitting}>
-                {isSubmitting ? 'Salvando...' : 'Cadastrar'}
+              <Button 
+                type="button" 
+                onClick={submitForm} 
+                disabled={isSubmitting}
+                $loading={isSubmitting}
+              >
+                {isSubmitting ? '' : 'Cadastrar'}
               </Button>
 
               <Links>
                 <Link to="/login">Já tenho conta</Link>
               </Links>
             </Form>
-          )}
+            );
+          }}
         </Formik>
       </Card>
+      <div style={{ 
+        position: 'absolute', 
+        bottom: '20px', 
+        left: '50%', 
+        transform: 'translateX(-50%)',
+        color: 'rgba(255, 255, 255, 0.8)',
+        fontSize: '0.75rem',
+        textAlign: 'center',
+        zIndex: 1
+      }}>
+        © Copyright toninosdev.com 2026.<br />
+        Todos os direitos reservados
+      </div>
     </Page>
   );
 }

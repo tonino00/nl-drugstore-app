@@ -16,6 +16,18 @@ export const setupApiInterceptors = (store: MinimalStore, client: AxiosInstance 
   if (initialized) return;
   initialized = true;
 
+  client.interceptors.request.use(
+    (config) => {
+      const token = store.getState().auth?.csrfToken;
+      if (token) {
+        config.headers = config.headers || {};
+        config.headers['X-CSRF-Token'] = token;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
   client.interceptors.response.use(
     (response) => response,
     (error) => {

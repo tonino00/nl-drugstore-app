@@ -8,6 +8,7 @@ import { createNotificationEventSource } from '../services/notificationService';
 export const useSSE = () => {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const csrfToken = useAppSelector((state) => state.auth.csrfToken);
   const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export const useSSE = () => {
     const connectSSE = () => {
       if (!alive) return;
 
-      const eventSource = createNotificationEventSource();
+      const eventSource = createNotificationEventSource(csrfToken);
 
       eventSource.addEventListener('notification', (event) => {
         const notification = JSON.parse((event as MessageEvent).data);
@@ -57,5 +58,5 @@ export const useSSE = () => {
         eventSourceRef.current.close();
       }
     };
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, csrfToken, dispatch]);
 };

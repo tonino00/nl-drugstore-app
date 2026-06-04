@@ -1,45 +1,47 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FaHome, FaBell, FaUser, FaSignOutAlt } from 'react-icons/fa';
 
 import { useAuth } from '../../hooks/useAuth';
 import { medicineService } from '../../services/medicineService';
 import type { Medicine } from '../../types/medicine.types';
+import DashboardKPIs from '../../components/Dashboard/DashboardKPIs';
+import DashboardCharts from '../../components/Dashboard/DashboardCharts';
+import AlertsSection from '../../components/Dashboard/AlertsSection';
+import QuickActions from '../../components/Dashboard/QuickActions';
 import ExpiryAlertCard from '../../components/Dashboard/ExpiryAlertCard';
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageSubtitle,
+  ResponsiveGrid,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Flex,
+  Text,
+  Spacer,
+  ActionButton,
+} from '../../styles/components/Stock/styles';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
-  const [stats, setStats] = useState({
-    total: 0,
-    lowStock: 0,
-    expiring30: 0,
-    expiring7: 0,
-  });
-  const [lowStockItems, setLowStockItems] = useState<Medicine[]>([]);
-  const [expiringItems, setExpiringItems] = useState<Medicine[]>([]);
+  const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
         setLoading(true);
-        const [all, low, exp30, exp7] = await Promise.all([
-          medicineService.list({ page: 1, limit: 1 }),
-          medicineService.lowStock(),
-          medicineService.expiring(30),
-          medicineService.expiring(7),
-        ]);
+        const data = await medicineService.list({ page: 1, limit: 100 });
         if (mounted) {
-          setStats({
-            total: all.total || 0,
-            lowStock: low.length,
-            expiring30: exp30.length,
-            expiring7: exp7.length,
-          });
-          setLowStockItems(low.slice(0, 5));
-          setExpiringItems(exp7.slice(0, 5));
+          setMedicines(data.items || []);
         }
       } catch {
         if (mounted) toast.error('Falha ao carregar dashboard');
@@ -52,102 +54,139 @@ export default function DashboardPage() {
     };
   }, []);
 
+  // Atualizar tempo a cada minuto
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   if (user?.role !== 'pharmacist' && user?.role !== 'admin') {
     return (
-      <div>
-        <h2>Dashboard</h2>
-        <p>Acesso restrito.</p>
-      </div>
+      <PageContainer>
+        <PageHeader>
+          <div>
+            <PageTitle>Acesso Restrito</PageTitle>
+            <PageSubtitle>Você não tem permissão para acessar o dashboard.</PageSubtitle>
+          </div>
+        </PageHeader>
+      </PageContainer>
     );
   }
 
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return 'Bom dia';
+    if (hour < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   return (
-    <div>
-      <h2>Dashboard</h2>
-
-      {loading ? <p>Carregando...</p> : null}
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 16,
-          marginBottom: 24,
-        }}
-      >
-        <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 16 }}>
-          <div style={{ fontSize: 12, color: '#6b7280' }}>Total de medicamentos</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{stats.total}</div>
-          <Link to="/medicines">Ver todos</Link>
-        </div>
-        <div style={{ border: '1px solid #fca5a5', borderRadius: 8, padding: 16, background: '#fef2f2' }}>
-          <div style={{ fontSize: 12, color: '#dc2626' }}>Estoque baixo</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#dc2626' }}>{stats.lowStock}</div>
-          <Link to="/stock/inventory">Gerenciar estoque</Link>
-        </div>
-        <div style={{ border: '1px solid #fcd34d', borderRadius: 8, padding: 16, background: '#fffbeb' }}>
-          <div style={{ fontSize: 12, color: '#d97706' }}>Vencendo em 30 dias</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#d97706' }}>{stats.expiring30}</div>
-        </div>
-        <div style={{ border: '1px solid #f87171', borderRadius: 8, padding: 16, background: '#fef2f2' }}>
-          <div style={{ fontSize: 12, color: '#dc2626' }}>Vencendo em 7 dias</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: '#dc2626' }}>{stats.expiring7}</div>
-        </div>
-      </div>
-
-      {lowStockItems.length > 0 ? (
-        <div style={{ marginBottom: 24 }}>
-          <h3>Estoque baixo</h3>
-          <div style={{ display: 'grid', gap: 8 }}>
-            {lowStockItems.map((m) => (
-              <div
-                key={m.id}
-                style={{
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 8,
-                  padding: 12,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <span>{m.nome}</span>
-                <span style={{ color: '#dc2626', fontWeight: 600 }}>Qtd: {m.quantidade}</span>
-                <Link to={`/stock/manage/${m.id}`}>Repor</Link>
-              </div>
-            ))}
+    <PageContainer>
+      {/* Header com perfil */}
+      <PageHeader>
+        <Flex $justify="between" $align="center" $wrap>
+          <div>
+            <PageTitle>Dashboard</PageTitle>
+            <PageSubtitle>
+              {getGreeting()}, {user?.nome}! • {formatDate(currentTime)}
+            </PageSubtitle>
           </div>
-        </div>
-      ) : null}
+          <Flex $gap="12px">
+            <ActionButton onClick={() => window.location.href = '/alerts'}>
+              <FaBell />
+              Alertas
+            </ActionButton>
+            <ActionButton onClick={() => window.location.href = '/profile'}>
+              <FaUser />
+              Perfil
+            </ActionButton>
+            <ActionButton onClick={logout} style={{ color: '#D32F2F' }}>
+              <FaSignOutAlt />
+              Sair
+            </ActionButton>
+          </Flex>
+        </Flex>
+      </PageHeader>
 
-      {expiringItems.length > 0 ? (
+      {/* Seção Hero com KPIs */}
+      <Card style={{ 
+        background: '#2E7D32', 
+        color: '#fff',
+        borderRadius: '8px',
+        padding: '32px'
+      }}>
+        <Flex $justify="between" $align="center">
+          <div style={{ flex: 1 }}>
+            <Text $size="xl" $weight="bold" style={{ color: '#fff', marginBottom: '4px' }}>
+              🏢 Farmácia NL - Sistema de Gestão
+            </Text>
+          </div>
+          <div style={{ 
+            textAlign: 'right',
+            paddingLeft: '20px',
+            marginLeft: '20px',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.2)'
+          }}>
+            <div style={{ marginBottom: '6px' }}>
+              <Text $size="lg" $weight="semibold" style={{ color: '#fff', lineHeight: '1' }}>
+                {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+              </Text>
+            </div>
+            <Text style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.2' }}>
+              Última atualização
+            </Text>
+          </div>
+        </Flex>
+      </Card>
+
+      <Spacer $size="lg" />
+
+      {/* KPIs Principais */}
+      <DashboardKPIs medicines={medicines} loading={loading} />
+      
+      <Spacer $size="lg" />
+
+      {/* Gráficos e Alertas */}
+      <ResponsiveGrid $columns={3}>
+        <div style={{ gridColumn: 'span 2' }}>
+          <DashboardCharts medicines={medicines} loading={loading} />
+        </div>
         <div>
-          <h3>Vencendo em breve (7 dias)</h3>
-          <div style={{ display: 'grid', gap: 8 }}>
-            {expiringItems.map((m) => (
-              <div
-                key={m.id}
-                style={{
-                  border: '1px solid #e5e7eb',
-                  borderRadius: 8,
-                  padding: 12,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <span>{m.nome}</span>
-                <span style={{ color: '#d97706' }}>
-                  Validade: {m.validade ? new Date(m.validade).toLocaleDateString() : '-'}
-                </span>
-                <Link to={`/medicines/${m.id}`}>Ver</Link>
-              </div>
-            ))}
-          </div>
+          <AlertsSection medicines={medicines} loading={loading} />
         </div>
-      ) : null}
+      </ResponsiveGrid>
 
+      <Spacer $size="lg" />
+
+      {/* Ações Rápidas */}
+      <QuickActions />
+
+      <Spacer $size="lg" />
+
+      {/* Card de Alertas de Lotes (mantendo o original) */}
       <ExpiryAlertCard />
-    </div>
+
+      <Spacer $size="lg" />
+
+      {/* Footer */}
+      <Card style={{ background: '#f8f9fa', textAlign: 'center' }}>
+        <CardContent>
+          <Text $size="sm" $color="#6B7280">
+            © 2026 Farmácia NL - Sistema de Gestão Farmacêutica
+          </Text>
+        </CardContent>
+      </Card>
+    </PageContainer>
   );
 }

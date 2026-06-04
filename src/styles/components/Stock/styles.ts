@@ -96,6 +96,7 @@ export const MetricHeader = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: ${theme.spacing.md};
+  gap: ${theme.spacing.lg};
 `;
 
 export const MetricTitle = styled.div`

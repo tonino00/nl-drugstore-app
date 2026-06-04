@@ -1,10 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { FaDownload, FaSave } from 'react-icons/fa';
 
 import type { Medicine } from '../../types/medicine.types';
 import { medicineService } from '../../services/medicineService';
 import { useAuth } from '../../hooks/useAuth';
+import DashboardCards from '../../components/Stock/DashboardCards';
+import StockTable from '../../components/Stock/StockTable';
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageSubtitle,
+  PrimaryButton,
+  Flex,
+  ResponsiveGrid,
+  ChartContainer,
+  ChartTitle,
+  Spacer,
+} from '../../styles/components/Stock/styles';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 export default function StockInventoryPage() {
   const { user } = useAuth();
@@ -37,12 +53,64 @@ export default function StockInventoryPage() {
 
   if (!isPharmacist) {
     return (
-      <div>
-        <h2>Estoque</h2>
-        <p>Acesso restrito.</p>
-      </div>
+      <PageContainer>
+        <PageHeader>
+          <div>
+            <PageTitle>Estoque</PageTitle>
+            <PageSubtitle>Acesso restrito.</PageSubtitle>
+          </div>
+        </PageHeader>
+      </PageContainer>
     );
   }
+
+  // Dados para gráficos
+  const chartData = useMemo(() => {
+    const statusData = [
+      { name: 'Normal', value: 0, color: '#2E7D32' },
+      { name: 'Baixo', value: 0, color: '#F57C00' },
+      { name: 'Crítico', value: 0, color: '#B71C1C' },
+      { name: 'Vencendo', value: 0, color: '#E65100' },
+      { name: 'Vencido', value: 0, color: '#616161' },
+    ];
+
+    const now = new Date();
+    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    items.forEach(medicine => {
+      const quantity = medicine.quantidade ?? 0;
+      const minimum = medicine.quantidade_minima ?? 0;
+      const expiry = medicine.validade ? new Date(medicine.validade) : null;
+
+      if (expiry && expiry < now) {
+        statusData[4].value++;
+      } else if (quantity === 0) {
+        statusData[2].value++;
+      } else if (quantity <= minimum) {
+        statusData[1].value++;
+      } else if (expiry && expiry <= thirtyDaysFromNow) {
+        statusData[3].value++;
+      } else {
+        statusData[0].value++;
+      }
+    });
+
+    return statusData;
+  }, [items]);
+
+  const locationData = useMemo(() => {
+    const locationMap = new Map<string, number>();
+    
+    items.forEach(medicine => {
+      const location = medicine.localizacao_prateleira || 'Não definida';
+      locationMap.set(location, (locationMap.get(location) || 0) + (medicine.quantidade || 0));
+    });
+
+    return Array.from(locationMap.entries())
+      .map(([location, quantity]) => ({ location, quantity }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 10);
+  }, [items]);
 
   const exportPDF = () => {
     const html = `
@@ -58,11 +126,31 @@ export default function StockInventoryPage() {
   th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
   th { background: #f5f5f5; font-weight: 600; }
   .badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .metric { text-align: center; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin: 10px; }
+  .metric-value { font-size: 24px; font-weight: bold; color: #2E7D32; }
+  .metric-label { font-size: 12px; color: #666; }
 </style>
 </head>
 <body>
   <h1>Relatório de Estoque</h1>
   <p>Gerado em: ${new Date().toLocaleString()}</p>
+  
+  <div class="header">
+    <div class="metric">
+      <div class="metric-value">${items.length}</div>
+      <div class="metric-label">Total de Medicamentos</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">${items.reduce((sum, m) => sum + (m.quantidade || 0), 0)}</div>
+      <div class="metric-label">Total de Itens</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">${items.filter(m => (m.quantidade || 0) <= (m.quantidade_minima || 0)).length}</div>
+      <div class="metric-label">Estoque Crítico</div>
+    </div>
+  </div>
+  
   <table>
     <thead>
       <tr>
@@ -139,73 +227,83 @@ export default function StockInventoryPage() {
     }
   };
 
-  return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-        <h2>Estoque</h2>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button type="button" onClick={exportPDF} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer' }}>
-            Exportar PDF
-          </button>
-          <button type="button" onClick={handleSaveCorrections} disabled={saving || Object.keys(realQuantities).length === 0}>
-            {saving ? 'Salvando...' : 'Salvar correções'}
-          </button>
-        </div>
-      </div>
+  const handleManage = (medicine: Medicine) => {
+    window.location.href = `/stock/manage/${medicine.id}`;
+  };
 
-      {loading ? (
-        <p>Carregando...</p>
-      ) : items.length === 0 ? (
-        <p>Nenhum medicamento encontrado.</p>
-      ) : (
-        <div style={{ display: 'grid', gap: 12 }}>
-          {items.map((m) => (
-            <div
-              key={m.id}
-              style={{
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                padding: 12,
-                display: 'flex',
-                justifyContent: 'space-between',
-                gap: 12,
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <strong style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.nome}</strong>
-                <small style={{ color: '#6b7280' }}>ID: {m.id} | Estoque atual: {m.quantidade ?? 0}</small>
-                {(m.quantidade ?? 0) < 5 ? (
-                  <span style={{ display: 'inline-block', marginLeft: 8, padding: '2px 8px', borderRadius: 4, background: '#fef2f2', color: '#dc2626', fontSize: 11, fontWeight: 600 }}>
-                    CRÍTICO
-                  </span>
-                ) : (m.quantidade ?? 0) <= 10 ? (
-                  <span style={{ display: 'inline-block', marginLeft: 8, padding: '2px 8px', borderRadius: 4, background: '#fffbeb', color: '#d97706', fontSize: 11, fontWeight: 600 }}>
-                    BAIXO
-                  </span>
-                ) : null}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <label style={{ fontSize: 12, color: '#6b7280' }}>Estoque real:</label>
-                <input
-                  type="number"
-                  min={0}
-                  style={{ width: 80 }}
-                  value={realQuantities[m.id] ?? ''}
-                  onChange={(e) =>
-                    setRealQuantities((prev) => ({
-                      ...prev,
-                      [m.id]: Number(e.target.value),
-                    }))
-                  }
-                />
-                <Link to={`/stock/manage/${m.id}`}>Gerenciar</Link>
-                <Link to={`/stock/movements/${m.id}`}>Movimentações</Link>
-              </div>
-            </div>
-          ))}
+  const handleHistory = (medicine: Medicine) => {
+    window.location.href = `/stock/movements/${medicine.id}`;
+  };
+
+  return (
+    <PageContainer>
+      <PageHeader>
+        <div>
+          <PageTitle>Gerenciamento de Estoque</PageTitle>
+          <PageSubtitle>
+            Controle completo de medicamentos e movimentações
+          </PageSubtitle>
         </div>
-      )}
-    </div>
+        <Flex $gap="12px" $wrap>
+          <PrimaryButton onClick={handleSaveCorrections} disabled={saving || Object.keys(realQuantities).length === 0}>
+            <FaSave />
+            {saving ? 'Salvando...' : 'Salvar Correções'}
+          </PrimaryButton>
+        </Flex>
+      </PageHeader>
+
+      {/* Dashboard Cards */}
+      <DashboardCards medicines={items} />
+      <Spacer $size="lg" />
+
+      {/* Gráficos */}
+      <ResponsiveGrid $columns={2}>
+        <ChartContainer>
+          <ChartTitle>Status do Estoque</ChartTitle>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={(entry) => `${entry.name}: ${entry.value}`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {chartData.map((entry: any, index: number) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+
+        <ChartContainer>
+          <ChartTitle>Itens por Localização</ChartTitle>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={locationData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="location" angle={-45} textAnchor="end" height={80} />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="quantity" fill="#2E7D32" />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </ResponsiveGrid>
+      <Spacer $size="lg" />
+
+      {/* Tabela de Estoque */}
+      <StockTable
+        medicines={items}
+        loading={loading}
+        onManage={handleManage}
+        onHistory={handleHistory}
+        onExport={exportPDF}
+      />
+    </PageContainer>
   );
 }

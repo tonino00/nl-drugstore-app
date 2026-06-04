@@ -15,6 +15,18 @@ export const theme = {
     white: '#FFFFFF',
     black: '#212121',
     background: '#F8F9FA',
+    // Stock status colors
+    stockCritical: '#B71C1C',
+    stockLow: '#F57C00',
+    stockNormal: '#2E7D32',
+    stockExpired: '#616161',
+    stockExpiring: '#E65100',
+    // UI colors
+    border: '#E5E7EB',
+    hover: '#F3F4F6',
+    textPrimary: '#111827',
+    textSecondary: '#6B7280',
+    textTertiary: '#9CA3AF',
   },
   spacing: {
     xs: '4px',

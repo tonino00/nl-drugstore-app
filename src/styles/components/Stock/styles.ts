@@ -59,6 +59,12 @@ export const DashboardGrid = styled.div`
     grid-template-columns: 1fr;
     gap: ${theme.spacing.md};
   }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 320px;
+    gap: ${theme.spacing.sm};
+    margin-bottom: ${theme.spacing.lg};
+  }
 `;
 
 interface MetricCardProps {
@@ -78,6 +84,10 @@ export const MetricCard = styled.div<MetricCardProps>`
   &:hover {
     box-shadow: ${theme.shadows.md};
     transform: translateY(-2px);
+  }
+
+  @media (max-width: 480px) {
+    padding: ${theme.spacing.sm};
   }
 
   &::before {
@@ -153,6 +163,11 @@ export const TableContainer = styled.div`
   box-shadow: ${theme.shadows.sm};
   border: 1px solid ${theme.colors.border};
   overflow: hidden;
+
+  @media (max-width: 480px) {
+    width: 320px;
+    margin: 0 auto;
+  }
 `;
 
 export const TableHeader = styled.div`
@@ -573,6 +588,11 @@ export const ResponsiveGrid = styled.div<ResponsiveGridProps>`
 
   @media (max-width: ${theme.breakpoints.mobile}) {
     grid-template-columns: 1fr;
+    gap: ${theme.spacing.md};
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 320px;
     gap: ${theme.spacing.md};
   }
 `;

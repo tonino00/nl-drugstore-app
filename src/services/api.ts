@@ -6,6 +6,9 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
   withCredentials: true,
+  // Garantir que cookies funcionem no mobile
+  xsrfCookieName: 'csrf-token',
+  xsrfHeaderName: 'X-CSRF-Token',
 });
 
 // Configuração de retry para 503

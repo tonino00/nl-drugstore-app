@@ -102,7 +102,7 @@ export default function DashboardPage() {
               {getGreeting()}, {user?.nome}! • {formatDate(currentTime)}
             </PageSubtitle>
           </div>
-          <Flex $gap="12px">
+          <Flex $gap="12px" $wrap>
             <ActionButton onClick={() => window.location.href = '/alerts'}>
               <FaBell />
               Alertas
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         borderRadius: '8px',
         padding: '32px'
       }}>
-        <Flex $justify="between" $align="center">
+        <Flex $justify="between" $align="center" $wrap>
           <div style={{ flex: 1 }}>
             <Text $size="xl" $weight="bold" style={{ color: '#fff', marginBottom: '4px' }}>
               🏢 Farmácia NL - Sistema de Gestão
@@ -159,7 +159,7 @@ export default function DashboardPage() {
 
       {/* Gráficos e Alertas */}
       <ResponsiveGrid $columns={3}>
-        <div style={{ gridColumn: 'span 2' }}>
+        <div>
           <DashboardCharts medicines={medicines} loading={loading} />
         </div>
         <div>

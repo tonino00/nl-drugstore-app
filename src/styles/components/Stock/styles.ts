@@ -61,7 +61,7 @@ export const DashboardGrid = styled.div`
   }
 
   @media (max-width: 480px) {
-    grid-template-columns: 320px;
+    grid-template-columns: 1fr;
     gap: ${theme.spacing.sm};
     margin-bottom: ${theme.spacing.lg};
   }
@@ -165,7 +165,7 @@ export const TableContainer = styled.div`
   overflow: hidden;
 
   @media (max-width: 480px) {
-    width: 320px;
+    width: 100%;
     margin: 0 auto;
   }
 `;
@@ -592,7 +592,7 @@ export const ResponsiveGrid = styled.div<ResponsiveGridProps>`
   }
 
   @media (max-width: 480px) {
-    grid-template-columns: 320px;
+    grid-template-columns: 1fr;
     gap: ${theme.spacing.md};
   }
 `;

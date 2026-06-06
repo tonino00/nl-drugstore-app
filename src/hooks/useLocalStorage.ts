@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 export const useLocalStorage = <T,>(key: string) => {
   const get = useCallback((): T | null => {
-    const raw = localStorage.getItem(key);
+    const raw = sessionStorage.getItem(key);
     if (!raw) return null;
     try {
       return JSON.parse(raw) as T;
@@ -13,13 +13,13 @@ export const useLocalStorage = <T,>(key: string) => {
 
   const set = useCallback(
     (value: T) => {
-      localStorage.setItem(key, JSON.stringify(value));
+      sessionStorage.setItem(key, JSON.stringify(value));
     },
     [key]
   );
 
   const remove = useCallback(() => {
-    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
   }, [key]);
 
   return { get, set, remove };

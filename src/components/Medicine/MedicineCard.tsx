@@ -1,7 +1,7 @@
 import { memo, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaBarcode } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 import type { Medicine } from '../../types/medicine.types';
@@ -51,6 +51,16 @@ const Meta = styled.div`
   color: ${({ theme }) => theme.colors.grayDark};
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   line-height: 1.4;
+`;
+
+const Code = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: ${({ theme }) => theme.spacing.xs};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.grayDark};
+  font-variant-numeric: tabular-nums;
 `;
 
 const HeartBtn = styled.button`
@@ -181,6 +191,11 @@ function MedicineCardBase({ medicine, hideFavorite = false }: MedicineCardProps)
             {medicine.principio_ativo || '-'}
             {medicine.concentracao ? ` · ${medicine.concentracao}` : ''}
           </Meta>
+          {medicine.codigo_barras ? (
+            <Code>
+              <FaBarcode aria-hidden /> {medicine.codigo_barras}
+            </Code>
+          ) : null}
         </div>
         {isPatient && !hideFavorite ? (
           <HeartBtn onClick={toggleFav} aria-label={isFav ? 'Remover favorito' : 'Favoritar'}>

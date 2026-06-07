@@ -66,6 +66,16 @@ export const medicineService = {
     const { data } = await api.get<Medicine>(`/medicines/${id}`);
     return data;
   },
+  async getByBarcode(code: string) {
+    try {
+      const { data } = await api.get<Medicine>(`/medicines/barcode/${encodeURIComponent(code)}`);
+      return data;
+    } catch (e: any) {
+      // 404: nenhum medicamento ativo com esse código de barras
+      if (e?.response?.status === 404) return null;
+      throw e;
+    }
+  },
   async create(payload: Partial<Medicine>) {
     const { data } = await api.post<Medicine>('/medicines', payload);
     return data;
@@ -79,6 +89,11 @@ export const medicineService = {
     payload: { delta: number; motivo: string; observacao?: string }
   ) {
     const { data } = await api.patch<Medicine>(`/medicines/${id}/stock`, payload);
+    return data;
+  },
+  // Define a quantidade absoluta em estoque (diferente de patchStock, que aplica um delta)
+  async updateStock(id: number | string, quantidade: number) {
+    const { data } = await api.put<Medicine>(`/medicines/${id}`, { quantidade });
     return data;
   },
   async movements(id: number | string, query: { page?: number; limit?: number }) {

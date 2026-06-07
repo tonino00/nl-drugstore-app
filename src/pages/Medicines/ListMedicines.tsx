@@ -1,17 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaBarcode } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 import { useDebounce } from '../../hooks/useDebounce';
 import { useAuth } from '../../hooks/useAuth';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMedicinesThunk } from '../../store/slices/medicineSlice';
+import { medicineService } from '../../services/medicineService';
 import MedicineCard from '../../components/Medicine/MedicineCard';
 import SkeletonCard from '../../components/Medicine/SkeletonCard';
+import BarcodeScanner from '../../components/Medicine/BarcodeScanner';
 
 import { Grid, Input, Select, Toolbar } from '../../styles/pages/Medicines/ListMedicines/styles';
 
 export default function ListMedicinesPage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { items, loading, total, page, pageSize } = useAppSelector((s) => s.medicines);
 
@@ -20,6 +25,7 @@ export default function ListMedicinesPage() {
   const [q, setQ] = useState('');
   const [category, setCategory] = useState('');
   const [limit, setLimit] = useState(20);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const debouncedQ = useDebounce(q, 300);
 
@@ -55,12 +61,46 @@ export default function ListMedicinesPage() {
     dispatch(fetchMedicinesThunk({ ...query, page: p }));
   };
 
+  // Lê o código → 200 abre o medicamento; 404 abre o cadastro já preenchido
+  const handleBarcode = async (code: string) => {
+    setScannerOpen(false);
+    try {
+      const found = await medicineService.getByBarcode(code);
+      if (found) {
+        navigate(`/medicines/${found.id}`);
+      } else {
+        toast('Medicamento não encontrado. Cadastre-o.', { icon: 'ℹ️' });
+        navigate(`/medicines/new?codigo_barras=${encodeURIComponent(code)}`);
+      }
+    } catch {
+      toast.error('Falha ao buscar pelo código de barras');
+    }
+  };
+
   return (
     <div>
       <h2>Medicamentos</h2>
       {canManage ? (
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <Link to="/medicines/new">Cadastrar medicamento</Link>
+          <button
+            type="button"
+            onClick={() => setScannerOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '8px 14px',
+              borderRadius: 8,
+              border: '1px solid #e5e7eb',
+              background: '#fff',
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            <FaBarcode aria-hidden /> Ler código de barras
+          </button>
         </div>
       ) : null}
       <Toolbar>
@@ -145,6 +185,10 @@ export default function ListMedicinesPage() {
           </div>
         </>
       )}
+
+      {scannerOpen ? (
+        <BarcodeScanner onDetected={handleBarcode} onClose={() => setScannerOpen(false)} />
+      ) : null}
     </div>
   );
 }

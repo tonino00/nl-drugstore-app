@@ -1,12 +1,14 @@
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { FaBarcode } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 import type { Medicine } from '../../types/medicine.types';
 import { medicineService } from '../../services/medicineService';
 import { useAuth } from '../../hooks/useAuth';
+import BarcodeScanner from '../../components/Medicine/BarcodeScanner';
 import {
   Actions,
   Button,
@@ -33,6 +35,7 @@ type FormValues = {
   concentracao: string;
   forma_farmaceutica: string;
   categoria: string;
+  codigo_barras: string;
   quantidade: number;
   quantidade_minima: number;
   validade: string;
@@ -48,6 +51,9 @@ const schema = Yup.object({
   concentracao: Yup.string().optional(),
   forma_farmaceutica: Yup.string().optional(),
   categoria: Yup.string().optional(),
+  codigo_barras: Yup.string()
+    .matches(/^\d{8,14}$/, { message: 'Use de 8 a 14 dígitos', excludeEmptyString: true })
+    .optional(),
   quantidade: Yup.number().min(0, 'Mínimo 0').required('Obrigatório'),
   quantidade_minima: Yup.number().min(0, 'Mínimo 0').optional(),
   validade: Yup.string().optional(),
@@ -71,14 +77,19 @@ export default function MedicineFormPage() {
   const { medicineId, id } = useParams();
   const rawId = id ?? medicineId;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const isPharmacist = user?.role === 'pharmacist' || user?.role === 'admin';
   const isEdit = Boolean(rawId);
+
+  // Pré-preenchimento ao vir de um scan sem correspondência (404 na listagem)
+  const prefillBarcode = searchParams.get('codigo_barras') || '';
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [current, setCurrent] = useState<Medicine | null>(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   const initialValues: FormValues = useMemo(
     () => ({
@@ -87,6 +98,7 @@ export default function MedicineFormPage() {
       concentracao: current?.concentracao || '',
       forma_farmaceutica: current?.forma_farmaceutica || '',
       categoria: current?.categoria || '',
+      codigo_barras: current?.codigo_barras || prefillBarcode,
       quantidade: current?.quantidade ?? 0,
       quantidade_minima: current?.quantidade_minima ?? 0,
       validade: toInputDate(current?.validade),
@@ -95,7 +107,7 @@ export default function MedicineFormPage() {
       contraindicacoes: current?.contraindicacoes || '',
       precisa_receita: Boolean(current?.precisa_receita),
     }),
-    [current]
+    [current, prefillBarcode]
   );
 
   useEffect(() => {
@@ -175,6 +187,7 @@ export default function MedicineFormPage() {
                 concentracao: values.concentracao || null,
                 forma_farmaceutica: values.forma_farmaceutica || null,
                 categoria: values.categoria || null,
+                codigo_barras: values.codigo_barras || null,
                 quantidade: Number(values.quantidade) || 0,
                 quantidade_minima: Number(values.quantidade_minima) || 0,
                 validade: values.validade ? new Date(values.validade).toISOString() : null,
@@ -198,7 +211,7 @@ export default function MedicineFormPage() {
             }
           }}
         >
-          {({ values, handleChange, touched, errors, isSubmitting }) => (
+          {({ values, handleChange, setFieldValue, touched, errors, isSubmitting }) => (
             <Form>
               <Section>
                 <SectionTitle>Informações básicas</SectionTitle>
@@ -241,6 +254,26 @@ export default function MedicineFormPage() {
                       onChange={handleChange}
                       placeholder="Ex: Comprimido"
                     />
+                  </FieldGroup>
+
+                  <FieldGroup className="full-width">
+                    <Label>Código de barras</Label>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Input
+                        name="codigo_barras"
+                        value={values.codigo_barras}
+                        onChange={handleChange}
+                        placeholder="Ex: 7891234567890"
+                        inputMode="numeric"
+                        style={{ flex: 1 }}
+                      />
+                      <Button type="button" variant="secondary" onClick={() => setScannerOpen(true)}>
+                        <FaBarcode aria-hidden /> Ler
+                      </Button>
+                    </div>
+                    {touched.codigo_barras && errors.codigo_barras ? (
+                      <Error>{errors.codigo_barras}</Error>
+                    ) : null}
                   </FieldGroup>
                 </Grid>
               </Section>
@@ -328,6 +361,16 @@ export default function MedicineFormPage() {
                   </Button>
                 ) : null}
               </Actions>
+
+              {scannerOpen ? (
+                <BarcodeScanner
+                  onDetected={(code) => {
+                    setFieldValue('codigo_barras', code);
+                    setScannerOpen(false);
+                  }}
+                  onClose={() => setScannerOpen(false)}
+                />
+              ) : null}
             </Form>
           )}
         </Formik>

@@ -9,6 +9,7 @@ export interface Medicine {
   contraindicacoes?: string | null;
   descricao?: string | null;
   localizacao_prateleira?: string | null;
+  codigo_barras?: string | null;
   validade?: string | null;
   quantidade: number;
   quantidade_minima?: number | null;

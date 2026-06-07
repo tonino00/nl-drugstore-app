@@ -579,12 +579,30 @@ export const ChartTitle = styled.h3`
 // Responsive Grid
 interface ResponsiveGridProps {
   $columns?: number;
+  $template?: string;
 }
 
 export const ResponsiveGrid = styled.div<ResponsiveGridProps>`
   display: grid;
-  grid-template-columns: ${props => props.$columns ? `repeat(${props.$columns}, 1fr)` : 'repeat(auto-fit, minmax(300px, 1fr))'};
+  grid-template-columns: ${props =>
+    props.$template
+      ? props.$template
+      : props.$columns
+      ? `repeat(${props.$columns}, minmax(0, 1fr))`
+      : 'repeat(auto-fit, minmax(300px, 1fr))'};
   gap: ${theme.spacing.lg};
+  align-items: start;
+
+  /* Em tablets, layouts assimétricos (template) e grids com mais de 2 colunas
+     reduzem a densidade para os cards manterem largura legível. */
+  @media (max-width: ${theme.breakpoints.tablet}) {
+    ${props =>
+      props.$template
+        ? 'grid-template-columns: 1fr;'
+        : props.$columns && props.$columns > 2
+        ? 'grid-template-columns: repeat(2, minmax(0, 1fr));'
+        : ''}
+  }
 
   @media (max-width: ${theme.breakpoints.mobile}) {
     grid-template-columns: 1fr;

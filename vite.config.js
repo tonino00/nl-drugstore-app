@@ -4,6 +4,7 @@ export default defineConfig(function (env) {
     var viteEnv = loadEnv(env.mode, process.cwd(), '');
     var apiTarget = viteEnv.VITE_PROXY_TARGET || 'http://localhost:3000';
     return {
+        base: '/',
         plugins: [react()],
         server: {
             port: 5173,

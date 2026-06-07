@@ -228,6 +228,11 @@ export const Button = styled.button<{ $loading?: boolean }>`
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 50px;
 
   &:before {
     content: '';
@@ -254,30 +259,41 @@ export const Button = styled.button<{ $loading?: boolean }>`
     transform: translateY(0);
   }
 
-  &:disabled {
-    opacity: 0.7;
+  /* Estado desabilitado "real" (ex.: formulário inválido), sem loading */
+  &:disabled:not([data-loading='true']) {
+    opacity: 0.6;
     cursor: not-allowed;
     transform: none;
     background: linear-gradient(135deg, #6b7280, #9ca3af);
   }
 
+  /* Durante o loading mantemos o gradiente da marca + spinner */
   ${({ $loading }) =>
     $loading &&
     `
+    cursor: progress;
     pointer-events: none;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 20px;
-      height: 20px;
-      margin: -10px 0 0 -10px;
-      border: 2px solid transparent;
-      border-top: 2px solid white;
+    background: linear-gradient(135deg, #0d7377, #14a085);
+    transform: none;
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.9);
+
+    /* desativa o brilho que cruza no hover */
+    &:before {
+      display: none;
+    }
+
+    .button-label {
+      opacity: 0.9;
+    }
+
+    .button-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #ffffff;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: spin 0.7s linear infinite;
     }
   `}
 

@@ -158,7 +158,7 @@ export default function DashboardPage() {
       <Spacer $size="lg" />
 
       {/* Gráficos e Alertas */}
-      <ResponsiveGrid $columns={3}>
+      <ResponsiveGrid $template="minmax(0, 2fr) minmax(0, 1fr)">
         <div>
           <DashboardCharts medicines={medicines} loading={loading} />
         </div>

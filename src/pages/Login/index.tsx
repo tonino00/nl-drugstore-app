@@ -131,13 +131,21 @@ export default function LoginPage() {
                 {loginError && !touched.senha && <Error>⚠ {loginError}</Error>}
               </Row>
 
-              <Button 
-                type="button" 
-                onClick={submitForm} 
-                disabled={isSubmitting}
+              <Button
+                type="button"
+                onClick={submitForm}
+                disabled={isSubmitting || loginSuccess}
+                data-loading={isSubmitting}
                 $loading={isSubmitting}
               >
-                {isSubmitting ? '' : 'Entrar'}
+                {isSubmitting ? (
+                  <>
+                    <span className="button-spinner" aria-hidden />
+                    <span className="button-label">Entrando...</span>
+                  </>
+                ) : (
+                  <span className="button-label">Entrar</span>
+                )}
               </Button>
 
               <Links>

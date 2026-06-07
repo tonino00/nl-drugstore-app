@@ -22,11 +22,20 @@ const Shell = styled.div`
 const Main = styled.main`
   display: flex;
   flex-direction: column;
+  /* Permite que o item do grid encolha abaixo da largura intrínseca do
+     conteúdo, fazendo os contêineres com overflow rolarem internamente em
+     vez de transbordarem a página no mobile. */
+  min-width: 0;
 `;
 
 const Content = styled.div`
   flex: 1;
+  min-width: 0;
   padding: ${({ theme }) => theme.spacing.lg};
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    padding: ${({ theme }) => theme.spacing.md};
+  }
 `;
 
 const Footer = styled.footer`

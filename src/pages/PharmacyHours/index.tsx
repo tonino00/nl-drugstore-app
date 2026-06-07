@@ -5,6 +5,39 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchPharmacyHoursThunk } from '../../store/slices/pharmacySlice';
 import { pharmacyService, type PharmacyDayHours } from '../../services/pharmacyService';
 import { useAuth } from '../../hooks/useAuth';
+import {
+  PageWrap,
+  PageTitle,
+  Card,
+  SectionTitle,
+  StatusCard,
+  StatusEmoji,
+  StatusLabel,
+  StatusHint,
+  TableScroll,
+  Table,
+  Th,
+  Td,
+  Badge,
+  ButtonRow,
+  PrimaryBtn,
+  SecondaryBtn,
+  SmallBtn,
+  SectionHeader,
+  ModalOverlay,
+  ModalBox,
+  ModalHeader,
+  ModalTitle,
+  CloseBtn,
+  Field,
+  FieldLabel,
+  TextInput,
+  TimeRow,
+  TimeInput,
+  RadioGroup,
+  RadioLabel,
+  Muted,
+} from '../../styles/components/PharmacyHours/styles';
 
 const DAYS = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
@@ -210,40 +243,40 @@ export default function PharmacyHoursPage() {
   const todayIndex = new Date().getDay();
 
   return (
-    <div>
-      <h2 style={{ marginBottom: 16 }}>Horário de funcionamento</h2>
+    <PageWrap>
+      <PageTitle>Horário de funcionamento</PageTitle>
 
       {/* Status atual */}
-      <div style={{ borderRadius: 12, border: '1px solid #e5e7eb', padding: 20, marginBottom: 24, textAlign: 'center', background: currentOpen === true ? '#e8f5e9' : currentOpen === false ? '#ffebee' : '#f5f5f5' }}>
+      <StatusCard $state={currentOpen === true ? 'open' : currentOpen === false ? 'closed' : 'unknown'}>
         {currentOpen !== null ? (
           <>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>{currentOpen ? '🟢' : '🔴'}</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: currentOpen ? '#2e7d32' : '#c62828' }}>
+            <StatusEmoji>{currentOpen ? '🟢' : '🔴'}</StatusEmoji>
+            <StatusLabel $open={currentOpen}>
               {currentOpen ? 'ABERTO AGORA' : 'FECHADO'}
-            </div>
-            <div style={{ fontSize: 14, color: '#616161', marginTop: 8 }}>
+            </StatusLabel>
+            <StatusHint>
               {currentOpen
                 ? `Próximo fechamento: ${nextClose || '-'} (hoje)`
                 : `Próxima abertura: ${nextOpen || '-'}`}
-            </div>
+            </StatusHint>
           </>
         ) : (
-          <div style={{ color: '#9e9e9e' }}>Carregando status...</div>
+          <Muted>Carregando status...</Muted>
         )}
-      </div>
+      </StatusCard>
 
       {/* Horários da semana */}
-      <div style={{ borderRadius: 12, border: '1px solid #e5e7eb', padding: 16, marginBottom: 24 }}>
-        <h3 style={{ marginTop: 0, marginBottom: 12 }}>Horários da semana</h3>
-        <div style={{ overflow: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+      <Card>
+        <SectionTitle>Horários da semana</SectionTitle>
+        <TableScroll>
+          <Table>
             <thead>
               <tr style={{ background: '#f9fafb' }}>
-                <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>Dia</th>
-                <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'center' }}>Status</th>
-                <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'center' }}>Horário</th>
-                <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'center' }}>Almoço</th>
-                <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'center' }}>Ações</th>
+                <Th>Dia</Th>
+                <Th $align="center">Status</Th>
+                <Th $align="center">Horário</Th>
+                <Th $align="center">Almoço</Th>
+                <Th $align="center">Ações</Th>
               </tr>
             </thead>
             <tbody>
@@ -251,194 +284,190 @@ export default function PharmacyHoursPage() {
                 const isToday = day.day_of_week === todayIndex;
                 return (
                   <tr key={day.day_of_week} style={{ borderBottom: '1px solid #f3f4f6', background: isToday ? '#e3f2fd' : undefined }}>
-                    <td style={{ padding: 10, fontWeight: isToday ? 600 : 400 }}>
+                    <Td style={{ fontWeight: isToday ? 600 : 400 }}>
                       {DAYS[day.day_of_week]}
                       {isToday ? <span style={{ fontSize: 11, color: '#1976d2', marginLeft: 6 }}>(hoje)</span> : null}
-                    </td>
-                    <td style={{ padding: 10, textAlign: 'center' }}>
-                      {day.is_open ? (
-                        <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, color: '#16a34a', background: '#f0fdf4' }}>🟢 Aberto</span>
-                      ) : (
-                        <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, color: '#dc2626', background: '#fef2f2' }}>🔴 Fechado</span>
-                      )}
-                    </td>
-                    <td style={{ padding: 10, textAlign: 'center' }}>
+                    </Td>
+                    <Td $align="center">
+                      <Badge $open={!!day.is_open}>{day.is_open ? '🟢 Aberto' : '🔴 Fechado'}</Badge>
+                    </Td>
+                    <Td $align="center">
                       {day.is_open ? `${day.opening_time || '-'} - ${day.closing_time || '-'}` : 'Fechado'}
-                    </td>
-                    <td style={{ padding: 10, textAlign: 'center', color: '#9e9e9e' }}>-</td>
-                    <td style={{ padding: 10, textAlign: 'center' }}>
+                    </Td>
+                    <Td $align="center" style={{ color: '#9e9e9e' }}>-</Td>
+                    <Td $align="center">
                       {isStaff ? (
-                        <button type="button" onClick={() => openEdit(day)} style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontSize: 13 }}>
+                        <SmallBtn type="button" onClick={() => openEdit(day)}>
                           Editar
-                        </button>
+                        </SmallBtn>
                       ) : null}
-                    </td>
+                    </Td>
                   </tr>
                 );
               })}
             </tbody>
-          </table>
-        </div>
+          </Table>
+        </TableScroll>
 
         {isStaff ? (
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
-            <button type="button" onClick={handleSave} disabled={saving} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#2E7D32', color: '#fff', cursor: 'pointer' }}>
+          <ButtonRow>
+            <PrimaryBtn type="button" onClick={handleSave} disabled={saving}>
               {saving ? 'Salvando...' : 'Salvar'}
-            </button>
-          </div>
+            </PrimaryBtn>
+          </ButtonRow>
         ) : null}
-      </div>
+      </Card>
 
       {/* Feriados */}
       {isStaff ? (
-        <div style={{ borderRadius: 12, border: '1px solid #e5e7eb', padding: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3 style={{ margin: 0 }}>Horários especiais (Feriados)</h3>
-            <button type="button" onClick={() => setHolidayModalOpen(true)} style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer' }}>
+        <Card style={{ marginBottom: 0 }}>
+          <SectionHeader>
+            <SectionTitle style={{ margin: 0 }}>Horários especiais (Feriados)</SectionTitle>
+            <SecondaryBtn type="button" onClick={() => setHolidayModalOpen(true)}>
               + Adicionar feriado
-            </button>
-          </div>
+            </SecondaryBtn>
+          </SectionHeader>
 
           {holidays.length === 0 ? (
-            <p style={{ color: '#9e9e9e' }}>Nenhum feriado cadastrado.</p>
+            <Muted>Nenhum feriado cadastrado.</Muted>
           ) : (
-            <div style={{ overflow: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+            <TableScroll>
+              <Table>
                 <thead>
                   <tr style={{ background: '#f9fafb' }}>
-                    <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>Data</th>
-                    <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>Nome</th>
-                    <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'center' }}>Horário</th>
-                    <th style={{ padding: 10, borderBottom: '2px solid #e5e7eb', textAlign: 'center' }}>Ações</th>
+                    <Th>Data</Th>
+                    <Th>Nome</Th>
+                    <Th $align="center">Horário</Th>
+                    <Th $align="center">Ações</Th>
                   </tr>
                 </thead>
                 <tbody>
                   {holidays.map((h) => (
                     <tr key={h.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                      <td style={{ padding: 10 }}>{new Date(h.date).toLocaleDateString()}</td>
-                      <td style={{ padding: 10 }}>{h.name}</td>
-                      <td style={{ padding: 10, textAlign: 'center' }}>
+                      <Td>{new Date(h.date).toLocaleDateString()}</Td>
+                      <Td>{h.name}</Td>
+                      <Td $align="center">
                         {h.is_open ? `${h.opening_time || '-'} - ${h.closing_time || '-'}` : (
-                          <span style={{ padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 600, color: '#dc2626', background: '#fef2f2' }}>Fechado</span>
+                          <Badge $open={false}>Fechado</Badge>
                         )}
-                      </td>
-                      <td style={{ padding: 10, textAlign: 'center' }}>
-                        <button type="button" onClick={() => deleteHoliday(h.id)} style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer' }}>🗑️</button>
-                      </td>
+                      </Td>
+                      <Td $align="center">
+                        <SmallBtn type="button" onClick={() => deleteHoliday(h.id)}>🗑️</SmallBtn>
+                      </Td>
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
+              </Table>
+            </TableScroll>
           )}
-        </div>
+        </Card>
       ) : null}
 
       {/* Modal editar dia */}
       {editModalOpen && editDay ? (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 420 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0 }}>Editar - {DAYS[editDay.day_of_week]}</h3>
-              <button type="button" onClick={() => setEditModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>✕</button>
-            </div>
+        <ModalOverlay>
+          <ModalBox>
+            <ModalHeader>
+              <ModalTitle>Editar - {DAYS[editDay.day_of_week]}</ModalTitle>
+              <CloseBtn type="button" onClick={() => setEditModalOpen(false)}>✕</CloseBtn>
+            </ModalHeader>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 14, fontWeight: 500 }}>Status *</label>
-              <div style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+            <Field>
+              <FieldLabel>Status *</FieldLabel>
+              <RadioGroup>
+                <RadioLabel>
                   <input type="radio" name="dayStatus" checked={editDay.is_open} onChange={() => setEditDay((d) => d ? { ...d, is_open: true } : d)} /> Aberto
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                </RadioLabel>
+                <RadioLabel>
                   <input type="radio" name="dayStatus" checked={!editDay.is_open} onChange={() => setEditDay((d) => d ? { ...d, is_open: false } : d)} /> Fechado
-                </label>
-              </div>
-            </div>
+                </RadioLabel>
+              </RadioGroup>
+            </Field>
 
             {editDay.is_open ? (
               <>
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 14, fontWeight: 500 }}>Horário de abertura</label>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
-                    <input type="time" value={editDay.opening_time || ''} onChange={(e) => setEditDay((d) => d ? { ...d, opening_time: e.target.value } : d)} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+                <Field>
+                  <FieldLabel>Horário de abertura</FieldLabel>
+                  <TimeRow>
+                    <TimeInput type="time" value={editDay.opening_time || ''} onChange={(e) => setEditDay((d) => d ? { ...d, opening_time: e.target.value } : d)} />
                     <span>às</span>
-                    <input type="time" value={editDay.closing_time || ''} onChange={(e) => setEditDay((d) => d ? { ...d, closing_time: e.target.value } : d)} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
-                  </div>
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 14 }}>
+                    <TimeInput type="time" value={editDay.closing_time || ''} onChange={(e) => setEditDay((d) => d ? { ...d, closing_time: e.target.value } : d)} />
+                  </TimeRow>
+                </Field>
+                <Field>
+                  <RadioLabel>
                     <input type="checkbox" checked={!!editLunchStart} onChange={(e) => { if (!e.target.checked) { setEditLunchStart(''); setEditLunchEnd(''); } else { setEditLunchStart('12:00'); setEditLunchEnd('13:00'); } }} />
                     Tem intervalo de almoço
-                  </label>
+                  </RadioLabel>
                   {editLunchStart ? (
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6, marginLeft: 24 }}>
+                    <TimeRow>
                       <span>Das</span>
-                      <input type="time" value={editLunchStart} onChange={(e) => setEditLunchStart(e.target.value)} style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+                      <TimeInput type="time" value={editLunchStart} onChange={(e) => setEditLunchStart(e.target.value)} />
                       <span>às</span>
-                      <input type="time" value={editLunchEnd} onChange={(e) => setEditLunchEnd(e.target.value)} style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
-                    </div>
+                      <TimeInput type="time" value={editLunchEnd} onChange={(e) => setEditLunchEnd(e.target.value)} />
+                    </TimeRow>
                   ) : null}
-                </div>
+                </Field>
               </>
             ) : null}
 
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
-              <button type="button" onClick={() => setEditModalOpen(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer' }}>Cancelar</button>
-              <button type="button" onClick={saveEditDay} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#2E7D32', color: '#fff', cursor: 'pointer' }}>Salvar</button>
-            </div>
-          </div>
-        </div>
+            <ButtonRow>
+              <SecondaryBtn type="button" onClick={() => setEditModalOpen(false)}>Cancelar</SecondaryBtn>
+              <PrimaryBtn type="button" onClick={saveEditDay}>Salvar</PrimaryBtn>
+            </ButtonRow>
+          </ModalBox>
+        </ModalOverlay>
       ) : null}
 
       {/* Modal adicionar feriado */}
       {holidayModalOpen ? (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
-          <div style={{ background: '#fff', borderRadius: 12, padding: 24, width: '100%', maxWidth: 420 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0 }}>Adicionar feriado</h3>
-              <button type="button" onClick={() => setHolidayModalOpen(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>✕</button>
-            </div>
+        <ModalOverlay>
+          <ModalBox>
+            <ModalHeader>
+              <ModalTitle>Adicionar feriado</ModalTitle>
+              <CloseBtn type="button" onClick={() => setHolidayModalOpen(false)}>✕</CloseBtn>
+            </ModalHeader>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 14, fontWeight: 500 }}>Nome do feriado *</label>
-              <input type="text" value={holidayForm.name || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, name: e.target.value }))} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb', marginTop: 4 }} />
-            </div>
+            <Field>
+              <FieldLabel>Nome do feriado *</FieldLabel>
+              <TextInput type="text" value={holidayForm.name || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, name: e.target.value }))} />
+            </Field>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 14, fontWeight: 500 }}>Data *</label>
-              <input type="date" value={holidayForm.date || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, date: e.target.value }))} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb', marginTop: 4 }} />
-            </div>
+            <Field>
+              <FieldLabel>Data *</FieldLabel>
+              <TextInput type="date" value={holidayForm.date || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, date: e.target.value }))} />
+            </Field>
 
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 14, fontWeight: 500 }}>Tipo *</label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+            <Field>
+              <FieldLabel>Tipo *</FieldLabel>
+              <RadioGroup $column>
+                <RadioLabel>
                   <input type="radio" name="holidayType" checked={!holidayForm.is_open} onChange={() => setHolidayForm((f) => ({ ...f, is_open: false }))} /> Fechado todo o dia
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                </RadioLabel>
+                <RadioLabel>
                   <input type="radio" name="holidayType" checked={holidayForm.is_open === true} onChange={() => setHolidayForm((f) => ({ ...f, is_open: true }))} /> Meio período / Horário diferenciado
-                </label>
-              </div>
-            </div>
+                </RadioLabel>
+              </RadioGroup>
+            </Field>
 
             {holidayForm.is_open ? (
-              <div style={{ marginBottom: 12 }}>
-                <label style={{ fontSize: 14, fontWeight: 500 }}>Horário</label>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
-                  <input type="time" value={holidayForm.opening_time || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, opening_time: e.target.value }))} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
+              <Field>
+                <FieldLabel>Horário</FieldLabel>
+                <TimeRow>
+                  <TimeInput type="time" value={holidayForm.opening_time || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, opening_time: e.target.value }))} />
                   <span>às</span>
-                  <input type="time" value={holidayForm.closing_time || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, closing_time: e.target.value }))} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid #e5e7eb' }} />
-                </div>
-              </div>
+                  <TimeInput type="time" value={holidayForm.closing_time || ''} onChange={(e) => setHolidayForm((f) => ({ ...f, closing_time: e.target.value }))} />
+                </TimeRow>
+              </Field>
             ) : null}
 
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 16 }}>
-              <button type="button" onClick={() => setHolidayModalOpen(false)} style={{ padding: '8px 16px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#fff', cursor: 'pointer' }}>Cancelar</button>
-              <button type="button" onClick={addHoliday} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#2E7D32', color: '#fff', cursor: 'pointer' }}>Salvar</button>
-            </div>
-          </div>
-        </div>
+            <ButtonRow>
+              <SecondaryBtn type="button" onClick={() => setHolidayModalOpen(false)}>Cancelar</SecondaryBtn>
+              <PrimaryBtn type="button" onClick={addHoliday}>Salvar</PrimaryBtn>
+            </ButtonRow>
+          </ModalBox>
+        </ModalOverlay>
       ) : null}
-    </div>
+    </PageWrap>
   );
 }

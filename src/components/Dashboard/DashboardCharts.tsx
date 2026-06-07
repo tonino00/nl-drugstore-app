@@ -124,7 +124,7 @@ export default function DashboardCharts({ medicines, loading = false }: Dashboar
       {/* Gráfico de Pizza - Status do Estoque */}
       <ChartContainer>
         <ChartTitle>Status do Estoque</ChartTitle>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
               data={stockStatusData}
@@ -148,7 +148,7 @@ export default function DashboardCharts({ medicines, loading = false }: Dashboar
       {/* Gráfico de Barras - Top Medicamentos */}
       <ChartContainer>
         <ChartTitle>Top 10 Medicamentos (Estoque)</ChartTitle>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart data={topMedicinesData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
@@ -172,7 +172,7 @@ export default function DashboardCharts({ medicines, loading = false }: Dashboar
       {/* Gráfico de Linha - Timeline de Vencimentos */}
       <ChartContainer>
         <ChartTitle>Previsão de Vencimentos (Próximos 60 dias)</ChartTitle>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={300}>
           <LineChart data={expiryTimelineData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" fontSize={12} />
@@ -193,7 +193,7 @@ export default function DashboardCharts({ medicines, loading = false }: Dashboar
       {/* Gráfico de Barras - Itens por Localização */}
       <ChartContainer>
         <ChartTitle>Itens por Localização</ChartTitle>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart data={locationData} layout="horizontal">
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis type="number" />

@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-08T18:17:00.000Z",
+  "title": "Design System: nl-drugstore-app",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Verde Farmácia",
+        "canonical": "#2E7D32",
+        "tonalRamp": ["#0B1F0D", "#123F17", "#1B5E20", "#2E7D32", "#4CAF50", "#81C784", "#C8E6C9", "#F1F8E9"]
+      },
+      "secondary": {
+        "role": "secondary",
+        "displayName": "Âmbar de Atenção",
+        "canonical": "#FFA000",
+        "tonalRamp": ["#2A1700", "#5C3500", "#8F5600", "#C77800", "#FFA000", "#FFC107", "#FFE082", "#FFF8E1"]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "Vermelho de Risco",
+        "canonical": "#D32F2F",
+        "tonalRamp": ["#2A0808", "#5F1111", "#8E1B1B", "#B71C1C", "#D32F2F", "#EF5350", "#FFCDD2", "#FFEBEE"]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Fundo Operacional",
+        "canonical": "#F8F9FA",
+        "tonalRamp": ["#111827", "#374151", "#616161", "#9E9E9E", "#D1D5DB", "#E5E7EB", "#F3F4F6", "#F8F9FA"]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Texto Primário",
+        "canonical": "#111827",
+        "tonalRamp": ["#030712", "#111827", "#1F2937", "#374151", "#6B7280", "#9CA3AF", "#D1D5DB", "#F9FAFB"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Operacional",
+        "purpose": "Títulos principais de página e métricas grandes de dashboard."
+      },
+      "headline": {
+        "displayName": "Headline de Área",
+        "purpose": "Cabeçalhos de telas, autenticação e agrupamentos de conteúdo."
+      },
+      "title": {
+        "displayName": "Título de Componente",
+        "purpose": "Cards, nomes de medicamentos, painéis e subtítulos de tabela."
+      },
+      "body": {
+        "displayName": "Texto de Produto",
+        "purpose": "Células, descrições, metadados extensos e mensagens de estado."
+      },
+      "label": {
+        "displayName": "Label Funcional",
+        "purpose": "Botões, filtros, inputs, navegação, badges e cabeçalhos compactos."
+      }
+    },
+    "shadows": [
+      {
+        "name": "low-elevation",
+        "value": "0 1px 3px rgba(0,0,0,0.12)",
+        "purpose": "Cards, tabelas e containers em repouso."
+      },
+      {
+        "name": "medium-elevation",
+        "value": "0 4px 6px rgba(0,0,0,0.1)",
+        "purpose": "Hover de cards, botões primários e painéis com foco operacional."
+      },
+      {
+        "name": "high-elevation",
+        "value": "0 10px 15px rgba(0,0,0,0.1)",
+        "purpose": "Menus móveis e cards de medicamento em hover."
+      },
+      {
+        "name": "green-focus-ring",
+        "value": "0 0 0 3px rgba(46, 125, 50, 0.1)",
+        "purpose": "Campos de busca, inputs e selects ativos."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "0.2s ease",
+        "purpose": "Hover, active, foco, botões, linhas de tabela e cards em áreas operacionais."
+      },
+      {
+        "name": "drawer-slide",
+        "value": "0.25s ease",
+        "purpose": "Entrada e saída da navegação móvel."
+      },
+      {
+        "name": "spinner",
+        "value": "0.9s linear infinite",
+        "purpose": "Carregamento global e localizado."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "768px"
+      },
+      {
+        "name": "tablet",
+        "value": "1024px"
+      },
+      {
+        "name": "desktop",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ação operacional principal em formulários, estoque e fluxos administrativos.",
+      "html": "<button class=\"ds-btn-primary\">Salvar alterações</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 24px; border: 0; border-radius: 8px; background: #2E7D32; color: #FFFFFF; font-family: Poppins, Roboto, sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease; } .ds-btn-primary:hover { background: #1B5E20; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(46,125,50,0.2); } .ds-btn-primary:active { transform: scale(0.98); } .ds-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Ação auxiliar para filtros, exportação e comandos secundários.",
+      "html": "<button class=\"ds-btn-secondary\">Filtrar</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 8px 16px; border: 1px solid #E5E7EB; border-radius: 8px; background: #FFFFFF; color: #6B7280; font-family: Poppins, Roboto, sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease; } .ds-btn-secondary:hover { background: #F3F4F6; border-color: #2E7D32; color: #2E7D32; } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(46,125,50,0.15); } .ds-btn-secondary:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Search Input",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Campo de busca para medicamento, princípio ativo, localização ou filtro operacional.",
+      "html": "<label class=\"ds-search\"><span class=\"ds-search-icon\">⌕</span><input placeholder=\"Buscar medicamento...\" /></label>",
+      "css": ".ds-search { position: relative; display: block; width: 320px; max-width: 100%; font-family: Poppins, Roboto, sans-serif; } .ds-search input { width: 100%; padding: 8px 16px 8px 40px; border: 1px solid #E5E7EB; border-radius: 8px; background: #FFFFFF; color: #111827; font: inherit; font-size: 0.875rem; transition: border-color 0.2s ease, box-shadow 0.2s ease; } .ds-search input::placeholder { color: #9CA3AF; } .ds-search input:focus { outline: none; border-color: #2E7D32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); } .ds-search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #9CA3AF; pointer-events: none; }"
+    },
+    {
+      "name": "Operational Card",
+      "kind": "card",
+      "refersTo": "card-default",
+      "description": "Container padrão para KPIs, gráficos, formulários e agrupamentos de conteúdo.",
+      "html": "<article class=\"ds-card\"><h3>Total de Medicamentos</h3><strong>128</strong><p>Diferentes produtos</p></article>",
+      "css": ".ds-card { width: 280px; padding: 24px; border: 1px solid #E5E7EB; border-radius: 12px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.12); color: #111827; font-family: Poppins, Roboto, sans-serif; transition: transform 0.2s ease, box-shadow 0.2s ease; } .ds-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); } .ds-card h3 { margin: 0 0 16px; color: #6B7280; font-size: 0.875rem; font-weight: 500; line-height: 1.4; letter-spacing: 0.025em; text-transform: uppercase; } .ds-card strong { display: block; margin-bottom: 4px; color: #111827; font-size: 2rem; font-weight: 700; line-height: 1.2; } .ds-card p { margin: 0; color: #6B7280; font-size: 0.875rem; line-height: 1.5; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "badge-critical",
+      "description": "Badge semântico para status de estoque, validade e risco operacional.",
+      "html": "<span class=\"ds-badge ds-badge-critical\">CRÍTICO</span><span class=\"ds-badge ds-badge-normal\">NORMAL</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; margin-right: 8px; padding: 4px 8px; border-radius: 999px; font-family: Poppins, Roboto, sans-serif; font-size: 0.75rem; font-weight: 600; line-height: 1.4; letter-spacing: 0.025em; text-transform: uppercase; white-space: nowrap; } .ds-badge-critical { background: rgba(183, 28, 28, 0.1); color: #B71C1C; } .ds-badge-normal { background: rgba(46, 125, 50, 0.1); color: #2E7D32; }"
+    },
+    {
+      "name": "Stock Table Row",
+      "kind": "custom",
+      "refersTo": "table-row",
+      "description": "Linha de tabela para leitura rápida de medicamento, estoque, status, validade e ação.",
+      "html": "<table class=\"ds-table\"><thead><tr><th>Medicamento</th><th>Estoque</th><th>Status</th></tr></thead><tbody><tr><td><strong>Dipirona</strong><small>500mg</small></td><td>42</td><td><span>NORMAL</span></td></tr></tbody></table>",
+      "css": ".ds-table { width: 100%; min-width: 520px; border-collapse: collapse; overflow: hidden; border: 1px solid #E5E7EB; border-radius: 12px; background: #FFFFFF; font-family: Poppins, Roboto, sans-serif; font-size: 0.875rem; color: #111827; } .ds-table thead { background: #F5F5F5; } .ds-table th { padding: 16px 24px; text-align: left; color: #6B7280; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.025em; text-transform: uppercase; white-space: nowrap; } .ds-table td { padding: 16px 24px; border-top: 1px solid #E5E7EB; vertical-align: middle; } .ds-table tr { transition: background 0.2s ease; } .ds-table tbody tr:hover { background: #F3F4F6; } .ds-table strong { display: block; margin-bottom: 4px; font-weight: 600; } .ds-table small { color: #6B7280; } .ds-table span { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: rgba(46,125,50,0.1); color: #2E7D32; font-size: 0.75rem; font-weight: 600; }"
+    },
+    {
+      "name": "Sidebar Navigation Item",
+      "kind": "nav",
+      "refersTo": "sidebar-nav-item",
+      "description": "Item de navegação lateral para rotas de consulta, dashboard, estoque e notificações.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item ds-nav-active\" href=\"#\">▦ <span>Medicamentos</span></a><a class=\"ds-nav-item\" href=\"#\">▣ <span>Estoque</span></a></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 8px; width: 220px; padding: 24px; background: #FFFFFF; font-family: Poppins, Roboto, sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; color: #616161; text-decoration: none; font-size: 0.875rem; transition: background 0.2s ease, color 0.2s ease; } .ds-nav-item:hover { background: #F3F4F6; color: #2E7D32; } .ds-nav-item:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(46,125,50,0.15); } .ds-nav-active { background: #81C784; color: #1B5E20; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Estoque Vivo da Comunidade",
+    "overview": "O sistema visual comunica uma farmácia comunitária em operação constante: medicamentos disponíveis, estoque em movimento, vencimentos monitorados e alertas visíveis no momento certo. A interface deve parecer confiável e institucional, mas nunca fria; moradores precisam localizar informação sem fricção, enquanto farmacêuticos precisam agir rápido em telas densas.\n\nA base é um produto funcional, não uma superfície promocional. O verde institucional sustenta ações primárias e estados saudáveis, enquanto laranjas e vermelhos aparecem somente quando há risco operacional. Cards, tabelas, filtros e badges formam o vocabulário principal; decoração deve ceder espaço para disponibilidade, validade, lote, localização e próxima ação.",
+    "keyCharacteristics": [
+      "Operacional: cada bloco visual deve ajudar consulta, triagem, cadastro, controle ou decisão.",
+      "Estado explícito: disponibilidade, estoque baixo, crítico, vencido e vencendo precisam ser distinguíveis sem interpretação extra.",
+      "Densidade legível: dashboards e tabelas aceitam informação densa, desde que espaçamento, contraste e hierarquia preservem leitura rápida.",
+      "Consistência institucional: botões, campos, cards, navegação e alertas devem repetir o mesmo vocabulário de cor, raio, sombra e tipografia."
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Color Rule",
+        "body": "Verde, laranja, vermelho e azul não são decoração; cada uso deve carregar ação, estado ou prioridade operacional.",
+        "section": "colors"
+      },
+      {
+        "name": "The Risk Visibility Rule",
+        "body": "Estoque crítico, vencido e vencendo nunca podem depender apenas de texto pequeno; combine cor semântica com badge, rótulo ou posição clara.",
+        "section": "colors"
+      },
+      {
+        "name": "The Product Scale Rule",
+        "body": "Não use tipografia fluida ou display expressivo em áreas de tarefa; mantenha rem fixo, pesos previsíveis e contraste de escala moderado.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat First Rule",
+        "body": "Superfícies ficam planas por padrão; sombra maior só aparece como resposta a hover, foco, menu móvel ou camada temporária.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do usar Verde Farmácia para ações primárias, foco, navegação ativa e disponibilidade real.",
+      "Do usar Vermelho de Risco para estoque crítico, vencido, erro e falhas que exigem ação imediata.",
+      "Do manter cards, tabelas, formulários e navegação com o mesmo raio, borda e sombra para preservar consistência entre telas.",
+      "Do mostrar estados vazios, carregamento, erro e ausência de permissão com texto que oriente a próxima ação.",
+      "Do preservar densidade em dashboards e tabelas quando ela ajuda farmacêuticos a agir mais rápido."
+    ],
+    "donts": [
+      "Don't parecer um site promocional, uma landing page chamativa ou um dashboard genérico cheio de métricas decorativas.",
+      "Don't usar excesso de emojis, cores sem função, jargão técnico para usuários comuns ou placeholders permanentes.",
+      "Don't esconder estados críticos como estoque baixo, vencimento, erro de carregamento ou permissão negada.",
+      "Don't usar gradiente, vidro ou sombra pesada como linguagem padrão em áreas autenticadas de tarefa.",
+      "Don't criar botões, campos ou badges com estilos divergentes para a mesma função em telas diferentes."
+    ]
+  }
+}

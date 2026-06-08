@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { FaHome, FaBell, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import styled from 'styled-components';
+import { FaBell, FaCheckCircle, FaClock, FaExclamationTriangle, FaSignOutAlt, FaUser } from 'react-icons/fa';
 
 import { useAuth } from '../../hooks/useAuth';
 import { medicineService } from '../../services/medicineService';
@@ -26,9 +27,118 @@ import {
   Spacer,
   ActionButton,
 } from '../../styles/components/Stock/styles';
+import { theme } from '../../styles/theme';
+
+const DashboardHeaderActions = styled(Flex)`
+  @media (max-width: ${theme.breakpoints.mobile}) {
+    width: 100%;
+
+    ${ActionButton} {
+      min-height: 44px;
+      flex: 1;
+      justify-content: center;
+    }
+  }
+`;
+
+const LogoutButton = styled(ActionButton)`
+  color: ${theme.colors.danger};
+
+  &:hover {
+    background: ${theme.colors.danger};
+    border-color: ${theme.colors.danger};
+    color: ${theme.colors.white};
+  }
+`;
+
+const OperationalSummary = styled(Card)`
+  padding: ${theme.spacing.lg};
+  border-color: rgba(46, 125, 50, 0.18);
+  background: linear-gradient(0deg, rgba(46, 125, 50, 0.04), rgba(46, 125, 50, 0.04)), ${theme.colors.white};
+
+  &:hover {
+    transform: none;
+  }
+`;
+
+const SummaryContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: ${theme.spacing.lg};
+  flex-wrap: wrap;
+`;
+
+const SummaryTitleGroup = styled.div`
+  min-width: 240px;
+  flex: 1;
+`;
+
+const SummaryTitle = styled.h2`
+  margin: 0;
+  color: ${theme.colors.textPrimary};
+  font-size: ${theme.typography.fontSize.lg};
+  font-weight: ${theme.typography.fontWeight.semibold};
+  line-height: 1.3;
+`;
+
+const SummaryMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.sm};
+  margin-top: ${theme.spacing.sm};
+  color: ${theme.colors.textSecondary};
+  font-size: ${theme.typography.fontSize.sm};
+  line-height: 1.5;
+`;
+
+const SummaryStatus = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing.md};
+  flex-wrap: wrap;
+`;
+
+const StatusPill = styled.div<{ $tone: 'success' | 'warning' }>`
+  display: inline-flex;
+  align-items: center;
+  gap: ${theme.spacing.xs};
+  min-height: 36px;
+  padding: ${theme.spacing.xs} ${theme.spacing.sm};
+  border-radius: ${theme.borderRadius.md};
+  font-size: ${theme.typography.fontSize.sm};
+  font-weight: ${theme.typography.fontWeight.semibold};
+  background: ${({ $tone }) => ($tone === 'success' ? 'rgba(46, 125, 50, 0.1)' : 'rgba(245, 124, 0, 0.1)')};
+  color: ${({ $tone }) => ($tone === 'success' ? theme.colors.primaryDark : theme.colors.stockLow)};
+`;
+
+const TimeStamp = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: ${theme.spacing.xs};
+  padding-left: ${theme.spacing.md};
+  border-left: 1px solid ${theme.colors.border};
+
+  @media (max-width: ${theme.breakpoints.mobile}) {
+    align-items: flex-start;
+    padding-left: 0;
+    border-left: 0;
+  }
+`;
+
+const FooterCard = styled(Card)`
+  background: ${theme.colors.background};
+  text-align: center;
+
+  &:hover {
+    transform: none;
+  }
+`;
 
 export default function DashboardPage() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [loading, setLoading] = useState(false);
@@ -91,6 +201,15 @@ export default function DashboardPage() {
     });
   };
 
+  const requiresAttention = medicines.some((medicine) => {
+    const quantity = medicine.quantidade ?? 0;
+    const minimum = medicine.quantidade_minima ?? 0;
+    const expiry = medicine.validade ? new Date(medicine.validade) : null;
+    const sevenDaysFromNow = new Date(currentTime.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+    return quantity === 0 || quantity <= minimum || Boolean(expiry && expiry <= sevenDaysFromNow);
+  });
+
   return (
     <PageContainer>
       {/* Header com perfil */}
@@ -102,53 +221,49 @@ export default function DashboardPage() {
               {getGreeting()}, {user?.nome}! • {formatDate(currentTime)}
             </PageSubtitle>
           </div>
-          <Flex $gap="12px" $wrap>
-            <ActionButton onClick={() => window.location.href = '/alerts'}>
+          <DashboardHeaderActions $gap={theme.spacing.sm} $wrap>
+            <ActionButton onClick={() => navigate('/alerts')} aria-label="Ver alertas">
               <FaBell />
               Alertas
             </ActionButton>
-            <ActionButton onClick={() => window.location.href = '/profile'}>
+            <ActionButton onClick={() => navigate('/profile')} aria-label="Abrir perfil">
               <FaUser />
               Perfil
             </ActionButton>
-            <ActionButton onClick={logout} style={{ color: '#D32F2F' }}>
+            <LogoutButton onClick={logout} aria-label="Encerrar sessão">
               <FaSignOutAlt />
               Sair
-            </ActionButton>
-          </Flex>
+            </LogoutButton>
+          </DashboardHeaderActions>
         </Flex>
       </PageHeader>
 
       {/* Seção Hero com KPIs */}
-      <Card style={{ 
-        background: '#2E7D32', 
-        color: '#fff',
-        borderRadius: '8px',
-        padding: '32px'
-      }}>
-        <Flex $justify="between" $align="center" $wrap>
-          <div style={{ flex: 1 }}>
-            <Text $size="xl" $weight="bold" style={{ color: '#fff', marginBottom: '4px' }}>
-              🏢 Farmácia NL - Sistema de Gestão
-            </Text>
-          </div>
-          <div style={{ 
-            textAlign: 'right',
-            paddingLeft: '20px',
-            marginLeft: '20px',
-            borderLeft: '1px solid rgba(255, 255, 255, 0.2)'
-          }}>
-            <div style={{ marginBottom: '6px' }}>
-              <Text $size="lg" $weight="semibold" style={{ color: '#fff', lineHeight: '1' }}>
+      <OperationalSummary>
+        <SummaryContent>
+          <SummaryTitleGroup>
+            <SummaryTitle>Farmácia NL, visão operacional</SummaryTitle>
+            <SummaryMeta>
+              <FaClock />
+              Dados carregados para estoque, validade, lotes e alertas.
+            </SummaryMeta>
+          </SummaryTitleGroup>
+          <SummaryStatus>
+            <StatusPill $tone={requiresAttention ? 'warning' : 'success'}>
+              {requiresAttention ? <FaExclamationTriangle /> : <FaCheckCircle />}
+              {requiresAttention ? 'Itens exigem revisão' : 'Sem alertas urgentes'}
+            </StatusPill>
+            <TimeStamp>
+              <Text $size="lg" $weight="semibold">
                 {currentTime.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
               </Text>
-            </div>
-            <Text style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.2' }}>
-              Última atualização
-            </Text>
-          </div>
-        </Flex>
-      </Card>
+              <Text $size="xs" $color={theme.colors.textSecondary}>
+                Última atualização
+              </Text>
+            </TimeStamp>
+          </SummaryStatus>
+        </SummaryContent>
+      </OperationalSummary>
 
       <Spacer $size="lg" />
 
@@ -180,13 +295,13 @@ export default function DashboardPage() {
       <Spacer $size="lg" />
 
       {/* Footer */}
-      <Card style={{ background: '#f8f9fa', textAlign: 'center' }}>
+      <FooterCard>
         <CardContent>
-          <Text $size="sm" $color="#6B7280">
-            © 2026 Farmácia NL - Sistema de Gestão Farmacêutica
+          <Text $size="sm" $color={theme.colors.textSecondary}>
+            © 2026 Farmácia NL, Sistema de Gestão Farmacêutica
           </Text>
         </CardContent>
-      </Card>
+      </FooterCard>
     </PageContainer>
   );
 }
